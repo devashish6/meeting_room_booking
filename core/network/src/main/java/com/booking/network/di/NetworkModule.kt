@@ -12,7 +12,7 @@ import javax.inject.Singleton
 private const val BASE_URL = "https://firestore.googleapis.com/"
 @Module
 @InstallIn(SingletonComponent::class)
-class NetworkModule {
+internal object NetworkModule {
     @Singleton
     @Provides
     fun retrofitClient() : Retrofit {

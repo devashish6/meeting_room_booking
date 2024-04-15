@@ -33,6 +33,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.data.store)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
