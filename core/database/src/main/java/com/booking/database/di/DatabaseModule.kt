@@ -1,8 +1,8 @@
 package com.booking.database.di
 
-import SlotsDataBase
 import android.content.Context
 import androidx.room.Room
+import com.booking.database.SlotsDataBase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

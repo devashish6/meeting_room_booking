@@ -52,26 +52,26 @@ fun convertToJsonWithFields(jsonObject: JsonObject): JsonObject {
 }
 
 
-fun extractUserInfo(user: String): User {
-    val jsonObject = JSONObject(user)
-    val name = jsonObject.getString("name")
-    val fields = jsonObject.getJSONObject("fields")
-    val userId = extractID(name)
-    val userName = fields.getJSONObject("user_name").getString("stringValue")
-    val userEmail = fields.getJSONObject("user_email").getString("stringValue")
+//fun extractUserInfo(user: String): User {
+//    val jsonObject = JSONObject(user)
+//    val name = jsonObject.getString("name")
+//    val fields = jsonObject.getJSONObject("fields")
+//    val userId = extractID(name)
+//    val userName = fields.getJSONObject("user_name").getString("stringValue")
+//    val userEmail = fields.getJSONObject("user_email").getString("stringValue")
+//
+//    return User(userID = userId, name = userName, email = userEmail)
+//}
 
-    return User(userID = userId, name = userName, email = userEmail)
-}
-
-fun extraMeetingInfo(json: String): MeetingRoom {
-    val jsonObject = JSONObject(json)
-    val name = jsonObject.getString("name")
-    val fields = jsonObject.getJSONObject("fields")
-    val meetingRoomID = extractID(name)
-    val meetingRoomSize = fields.getJSONObject("meeting_room_size").getString("stringValue")
-    val location = fields.getJSONObject("location").getString("stringValue")
-
-    return MeetingRoom(meetingRoomID = meetingRoomID, meetingRoomSize = meetingRoomSize, location = location)
-}
+//fun extraMeetingInfo(json: String): MeetingRoom {
+//    val jsonObject = JSONObject(json)
+//    val name = jsonObject.getString("name")
+//    val fields = jsonObject.getJSONObject("fields")
+//    val meetingRoomID = extractID(name)
+//    val meetingRoomSize = fields.getJSONObject("meeting_room_size").getString("stringValue")
+//    val location = fields.getJSONObject("location").getString("stringValue")
+//
+//    return MeetingRoom(meetingRoomID = meetingRoomID, meetingRoomSize = meetingRoomSize, location = location)
+//}
 
 fun extractID(key: String) : String = key.split("/").last()

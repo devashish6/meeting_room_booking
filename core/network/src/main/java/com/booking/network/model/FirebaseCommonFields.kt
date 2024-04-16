@@ -21,7 +21,7 @@ data class FirebaseResponseFields<T> (
 
 data class StringValue(
     @SerializedName("stringValue")
-    val stringValue: String
+    var stringValue: String
 )
 
 data class IntegerValue(
