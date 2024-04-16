@@ -15,29 +15,35 @@ import retrofit2.http.Path
 interface ApiService {
     private companion object {
         const val FIREBASE_SLOTS = "v1/projects/slots-21fc8/databases/(default)/documents/"
+        const val MEETING_ROOM = "meeting_room"
+        const val USERS = "users"
+        const val MEETING_ROOM_BOOKING = "meeting_room_booking"
+        const val USER_ID = "userID"
+        const val MEETING_ROOM_ID = "meetingRoomID"
     }
-    @GET(FIREBASE_SLOTS + "meeting_room")
-    suspend fun getAllMeetingRooms() : FirebaseDocument<RemoteMeetingRoom>
 
-    @GET(FIREBASE_SLOTS + "meeting_room/{meetingRoomID}")
-    suspend fun getMeetingRoomByID(@Path("meetingRoomID") meetingRoomID: String, ): Response<FirebaseResponseFields<RemoteMeetingRoom>>
+    @POST(FIREBASE_SLOTS + USERS)
+    suspend fun createUser(@Body user: HashMap<String, String>) : Response<FirebaseResponseFields<RemoteUser>> //call on click of register - Register feature
 
-    @GET(FIREBASE_SLOTS + "users")
-    suspend fun getAllUsers() : FirebaseDocument<RemoteUser>
+    @PATCH("$FIREBASE_SLOTS$USERS/{$USER_ID}")
+    suspend fun updateUserID(@Path(USER_ID) userID: String, @Body user: HashMap<String, String>) : Response<FirebaseResponseFields<RemoteUser>> //call on success of register - Register feature
 
-    @GET(FIREBASE_SLOTS + "users/{userID}")
-    suspend fun getUserByUserID(@Path("userID") userID: String, ): Response<FirebaseResponseFields<RemoteUser>>
+    @GET(FIREBASE_SLOTS + USERS)
+    suspend fun getAllUsers() : FirebaseDocument<RemoteUser> //call while logging in (check for email and password information) - Login feature
 
-    @POST(FIREBASE_SLOTS + "users")
-    suspend fun createUser(@Body user: HashMap<String, String>) : Response<FirebaseResponseFields<RemoteUser>>
+    @GET(FIREBASE_SLOTS + MEETING_ROOM_BOOKING)
+    suspend fun getBookedMeetingRooms() : Response<FirebaseDocument<BookedMeetingRoom>> //call in dashboard - dashboard feature
 
-    @POST(FIREBASE_SLOTS + "meeting_room_booking")
-    suspend fun bookMeetingRoom(@Body user: HashMap<String, Any>) : Response<FirebaseResponseFields<BookedMeetingRoom>>
+    @GET(FIREBASE_SLOTS + MEETING_ROOM)
+    suspend fun getAllMeetingRooms() : FirebaseDocument<RemoteMeetingRoom> //call in booking screen before booking - booking feature
 
-    @GET(FIREBASE_SLOTS + "meeting_room_booking")
-    suspend fun getBookedMeetingRooms() : Response<FirebaseDocument<BookedMeetingRoom>>
+    @POST(FIREBASE_SLOTS + MEETING_ROOM_BOOKING)
+    suspend fun bookMeetingRoom(@Body user: HashMap<String, Any>) : Response<FirebaseResponseFields<BookedMeetingRoom>> //call in booking screen - booking feature
 
-    @PATCH(FIREBASE_SLOTS + "users/{userID}")
-    suspend fun updateUserID(@Path("userID") userID: String, @Body user: HashMap<String, String>) : Response<FirebaseResponseFields<RemoteUser>>
+    @GET("$FIREBASE_SLOTS$USERS/{$USER_ID}")
+    suspend fun getUserByUserID(@Path(USER_ID) userID: String, ): Response<FirebaseResponseFields<RemoteUser>> // call in agenda screen - agenda feature
+
+    @GET("$FIREBASE_SLOTS$MEETING_ROOM/{$MEETING_ROOM_ID}")
+    suspend fun getMeetingRoomByID(@Path(MEETING_ROOM_ID) meetingRoomID: String, ): Response<FirebaseResponseFields<RemoteMeetingRoom>>
 }
 
