@@ -16,10 +16,10 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun providesDatabase (@ApplicationContext context: Context) : SlotsDataBase =
+    fun providesDatabase(@ApplicationContext context: Context) : SlotsDataBase =
         Room.databaseBuilder(
             context,
             SlotsDataBase::class.java,
             "slots-database"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
 }
