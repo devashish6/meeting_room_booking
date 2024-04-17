@@ -3,19 +3,20 @@ package com.booking.network.model
 import com.google.gson.annotations.SerializedName
 
 data class RemoteUser(
-    @SerializedName("user_id")
-    var userId: StringValue,
+    var userId: String,
     @SerializedName("user_name")
     val userName: StringValue,
     @SerializedName("user_email")
-    val userEmail: StringValue
+    val userEmail: StringValue,
+    @SerializedName("user_password")
+    val userPassword: StringValue
 ) {
-    fun getUserId() : String {
-        return userId.stringValue
-    }
-    fun setUserId(encryptedUserId: String) {
-        userId.stringValue = encryptedUserId
-    }
+//    fun getUserId() : String {
+//        return userId
+//    }
+//    fun setUserId(encryptedUserId: String) {
+//        userId = encryptedUserId
+//    }
     fun getUserName() : String {
         return userName.stringValue
     }
@@ -23,5 +24,8 @@ data class RemoteUser(
         return userEmail.stringValue
     }
 
+    fun getUserPassword() : String {
+        return userPassword.stringValue
+    }
 }
 

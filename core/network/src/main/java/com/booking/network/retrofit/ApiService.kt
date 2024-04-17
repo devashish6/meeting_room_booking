@@ -25,8 +25,8 @@ interface ApiService {
     @POST(FIREBASE_SLOTS + USERS)
     suspend fun createUser(@Body user: HashMap<String, String>) : Response<FirebaseResponseFields<RemoteUser>> //call on click of register - Register feature
 
-    @PATCH("$FIREBASE_SLOTS$USERS/{$USER_ID}")
-    suspend fun updateUserID(@Path(USER_ID) userID: String, @Body user: HashMap<String, String>) : Response<FirebaseResponseFields<RemoteUser>> //call on success of register - Register feature
+//    @PATCH("$FIREBASE_SLOTS$USERS/{$USER_ID}")//Use emailID as primary key
+//    suspend fun updateUserID(@Path(USER_ID) userID: String, @Body user: HashMap<String, String>) : Response<FirebaseResponseFields<RemoteUser>> //call on success of register - Register feature
 
     @GET(FIREBASE_SLOTS + USERS)
     suspend fun getAllUsers() : FirebaseDocument<RemoteUser> //call while logging in (check for email and password information) - Login feature
