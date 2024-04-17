@@ -33,3 +33,5 @@ data class ArrayValue(
     @SerializedName("arrayValue")
     val arrayValue: List<String>
 )
+
+fun extractID(key: String) : String = key.split("/").last()

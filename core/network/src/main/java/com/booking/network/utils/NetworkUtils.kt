@@ -1,10 +1,7 @@
-package com.booking.common
+package com.booking.network.utils
 
-import com.booking.model.MeetingRoom
-import com.booking.model.User
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import org.json.JSONObject
 
 fun convertToCustomFormat(hashMap: HashMap<String, String>): JsonObject {
     val output = JsonObject()
@@ -73,5 +70,3 @@ fun convertToJsonWithFields(jsonObject: JsonObject): JsonObject {
 //
 //    return MeetingRoom(meetingRoomID = meetingRoomID, meetingRoomSize = meetingRoomSize, location = location)
 //}
-
-fun extractID(key: String) : String = key.split("/").last()
