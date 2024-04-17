@@ -1,6 +1,7 @@
 package com.booking.network.di
 
 import com.booking.network.retrofit.ApiService
+import com.booking.network.retrofit.RemoteDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,6 +26,14 @@ internal object NetworkModule {
     @Provides
     fun apiService(retrofit: Retrofit) : ApiService {
         return retrofit.create(ApiService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideRemoteDataSource(
+        apiService: ApiService
+    ) :  RemoteDataSource {
+        return RemoteDataSource(apiService)
     }
 
 }

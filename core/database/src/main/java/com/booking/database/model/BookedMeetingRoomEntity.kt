@@ -8,7 +8,6 @@ import androidx.room.PrimaryKey
 data class BookedMeetingRoomEntity(
     @PrimaryKey @ColumnInfo(name = "meeting_room_booking_id") var meetingRoomBookID: String,
     @ColumnInfo(name = "meeting_room_id") var meetingRoomID: String,
-    @ColumnInfo(name = "user_id") var userID: String,
     @ColumnInfo(name = "from_time") var fromTime: String,
     @ColumnInfo(name = "toTime") var toTime: String,
     @ColumnInfo(name = "host") var host: String,
