@@ -2,7 +2,7 @@ package com.booking.network.model
 
 import com.google.gson.annotations.SerializedName
 
-data class BookedMeetingRoom(
+data class RemoteBookedMeetingRooms(
     var meetingRoomBookingID : String,
     @SerializedName("from_time")
     val fromTime: StringValue,
@@ -22,7 +22,7 @@ data class BookedMeetingRoom(
     fun getFromTime() : String {
         return fromTime.stringValue
     }
-    fun getToTine() : String {
+    fun getToTime() : String {
         return toTime.stringValue
     }
     fun getMeetingRoomID() : String {

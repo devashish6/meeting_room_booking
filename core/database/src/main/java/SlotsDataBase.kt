@@ -20,6 +20,6 @@ abstract class SlotsDataBase : RoomDatabase () {
 
     abstract fun meetingRooomDao() : MeetingRoomDao
 
-    abstract fun userMeeting() : BookedMeetingRoomDao
+    abstract fun meetingRoomBooking() : BookedMeetingRoomDao
 
 }
