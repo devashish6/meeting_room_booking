@@ -36,11 +36,19 @@ android {
 dependencies {
     //Dagger
     implementation(libs.dagger.hilt)
+    implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.hilt.work)
     kapt(libs.dagger.hilt.compiler)
 
     //Retrofit
     implementation(libs.retrofit)
     implementation(libs.gson.converter)
+
+    //Worker
+    implementation(libs.androidx.work.runtime.ktx)
+
+    //Tracing
+    implementation(libs.androidx.tracing.ktx)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
