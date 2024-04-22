@@ -3,6 +3,7 @@ package com.booking.database.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 
 @Entity(tableName = "meeting_room_booking")
 data class BookedMeetingRoomEntity(
@@ -15,3 +16,15 @@ data class BookedMeetingRoomEntity(
     @ColumnInfo(name = "meeting_title") var meetingTitle: String,
     @ColumnInfo(name = "attendees") var attendees: List<String>
 )
+
+class Converters {
+    @TypeConverter
+    fun fromString(value: String): List<String> {
+        return value.split(",")
+    }
+
+    @TypeConverter
+    fun fromList(list: List<String>): String {
+        return list.joinToString(",")
+    }
+}

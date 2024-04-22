@@ -1,66 +1,36 @@
 package com.booking.data.worker
 
 import android.content.Context
+import android.util.Log
 import androidx.hilt.work.HiltWorker
-import androidx.work.Constraints
+import androidx.tracing.traceAsync
 import androidx.work.CoroutineWorker
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
-import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.booking.data.repository.DataRepository
+import com.booking.data.model.asEntity
+import com.booking.database.com.booking.database.repository.LocalDataSource
+import com.booking.database.com.booking.database.repository.LocalDataSourceInterface
+import com.booking.network.retrofit.RemoteDataSource
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @HiltWorker
-internal class SyncWorker @Inject constructor(
-    private val appContext: Context,
-    workerParams: WorkerParameters,
-    private val repository: DataRepository,
-) : CoroutineWorker(appContext, workerParams) {
+class SyncWorker @AssistedInject constructor(
+    private val remoteDataSource: RemoteDataSource,
+    private val localDataSource: LocalDataSource,
+    @Assisted private val context: Context,
+    @Assisted workerParameters: WorkerParameters,
+) : CoroutineWorker(context, workerParameters) {
 
+    private val TAG = "DATA_MODULE_DEBUG"
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        val syncedSuccessfully = awaitAll(
-            async { repository.syncWith() }).all { it }
-        if (syncedSuccessfully) {
+        traceAsync("Sync", 0) {
+            Log.d(TAG, "HELLO w02w20w2w0")
+            Log.d(TAG, localDataSource.toString())
+            Log.d(TAG, remoteDataSource.toString())
+            Log.d(TAG, remoteDataSource.getAllMeetingRooms().body()!!.documents[0].fields.asEntity().toString())
             Result.success()
-        } else {
-            Result.retry()
         }
     }
-
-    companion object {
-        fun startUpSyncWork() = OneTimeWorkRequestBuilder<DelegatingWorker>()
-            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-            .setConstraints(SyncConstraints)
-            .setInputData(SyncWorker::class.delegatedData())
-            .build()
-    }
 }
-
-val SyncConstraints
-    get() = Constraints.Builder()
-        .setRequiredNetworkType(NetworkType.CONNECTED)
-        .build()
-
-interface Syncable {
-    suspend fun syncWith(): Boolean
-}
-
-fun initialize(context: Context) {
-    WorkManager.getInstance(context).apply {
-        enqueueUniqueWork(
-            SYNC_WORK_NAME,
-            ExistingWorkPolicy.KEEP,
-            SyncWorker.startUpSyncWork(),
-        )
-    }
-}
-
-internal const val SYNC_WORK_NAME = "SyncWorkName"
-

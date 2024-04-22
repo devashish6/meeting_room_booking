@@ -1,9 +1,9 @@
 package com.booking.slots
 
 import android.app.Application
-import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-import com.booking.slots.SyncInitialize.initialize
+import com.booking.data.worker.SyncWorkerFactory
+import com.booking.data.worker.initializeWorker
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -11,10 +11,10 @@ import javax.inject.Inject
 class SlotsApplication : Application(), Configuration.Provider {
 
     @Inject
-    lateinit var hiltWorkerFactory: HiltWorkerFactory
+    lateinit var hiltWorkerFactory: SyncWorkerFactory
     override fun onCreate() {
         super.onCreate()
-        initialize(this)
+        initializeWorker(this)
     }
 
     override val workManagerConfiguration: Configuration
