@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.firebase)
+    alias(libs.plugins.hiltAndroid)
     kotlin("kapt")
 }
 
@@ -52,6 +53,17 @@ android {
 }
 
 dependencies {
+    //projects
+    implementation(project(":core:data"))
+
+    //Dagger
+    implementation(libs.dagger.hilt)
+    implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.hilt.work)
+    kapt(libs.dagger.hilt.compiler)
+
+    //Worker
+    implementation(libs.androidx.work.runtime.ktx)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
