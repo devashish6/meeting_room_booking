@@ -31,7 +31,12 @@ data class IntegerValue(
 
 data class ArrayValue(
     @SerializedName("arrayValue")
-    val arrayValue: List<String>
+    val arrayValue: StringValues
+)
+
+data class StringValues(
+    @SerializedName("values")
+    val values: List<StringValue>
 )
 
 fun extractID(key: String) : String = key.split("/").last()

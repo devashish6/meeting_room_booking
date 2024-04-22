@@ -22,27 +22,27 @@ interface ApiService {
     }
 
     @POST(FIREBASE_SLOTS + USERS)
-    suspend fun createUser(@Body user: HashMap<String, String>) : Response<FirebaseResponseFields<RemoteUser>> //call on click of register - Register feature
+    suspend fun createUser(@Body user: HashMap<String, String>) : FirebaseResponseFields<RemoteUser> //call on click of register - Register feature
 
 //    @PATCH("$FIREBASE_SLOTS$USERS/{$USER_ID}")//Use emailID as primary key
 //    suspend fun updateUserID(@Path(USER_ID) userID: String, @Body user: HashMap<String, String>) : Response<FirebaseResponseFields<RemoteUser>> //call on success of register - Register feature
 
     @GET(FIREBASE_SLOTS + USERS)
-    suspend fun getAllUsers() : Response<FirebaseDocument<RemoteUser>> //call while logging in (check for email and password information) - Login feature
+    suspend fun getAllUsers() : FirebaseDocument<RemoteUser> //call while logging in (check for email and password information) - Login feature
 
     @GET(FIREBASE_SLOTS + MEETING_ROOM_BOOKING)
-    suspend fun getBookedMeetingRooms() : Response<FirebaseDocument<RemoteBookedMeetingRooms>> //call in dashboard - dashboard feature
+    suspend fun getBookedMeetingRooms() : FirebaseDocument<RemoteBookedMeetingRooms> //call in dashboard - dashboard feature
 
     @GET(FIREBASE_SLOTS + MEETING_ROOM)
-    suspend fun getAllMeetingRooms() : Response<FirebaseDocument<RemoteMeetingRoom>> //call in booking screen before booking - booking feature
+    suspend fun getAllMeetingRooms() : FirebaseDocument<RemoteMeetingRoom> //call in booking screen before booking - booking feature
 
     @POST(FIREBASE_SLOTS + MEETING_ROOM_BOOKING)
-    suspend fun bookMeetingRoom(@Body user: HashMap<String, Any>) : Response<FirebaseResponseFields<RemoteBookedMeetingRooms>> //call in booking screen - booking feature
+    suspend fun bookMeetingRoom(@Body user: HashMap<String, Any>) : FirebaseResponseFields<RemoteBookedMeetingRooms> //call in booking screen - booking feature
 
     @GET("$FIREBASE_SLOTS$USERS/{$USER_ID}")
-    suspend fun getUserByUserID(@Path(USER_ID) userID: String, ): Response<FirebaseResponseFields<RemoteUser>> // call in agenda screen - agenda feature
+    suspend fun getUserByUserID(@Path(USER_ID) userID: String, ): FirebaseResponseFields<RemoteUser> // call in agenda screen - agenda feature
 
     @GET("$FIREBASE_SLOTS$MEETING_ROOM/{$MEETING_ROOM_ID}")
-    suspend fun getMeetingRoomByID(@Path(MEETING_ROOM_ID) meetingRoomID: String, ): Response<FirebaseResponseFields<RemoteMeetingRoom>>
+    suspend fun getMeetingRoomByID(@Path(MEETING_ROOM_ID) meetingRoomID: String, ): FirebaseResponseFields<RemoteMeetingRoom>
 }
 

@@ -5,7 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.booking.database.model.UserEntity
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UsersDao {
@@ -15,8 +14,8 @@ interface UsersDao {
     @Query("SELECT * from users")
     suspend fun getAllUsers() : List<UserEntity>
 
-    @Query("SELECT * FROM users WHERE id = :key")
-    suspend fun getUserByID(key: String) : UserEntity
+    @Query("SELECT * FROM users WHERE email = :key")
+    suspend fun getUserByEmail(key: String) : UserEntity
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addUsers(users: List<UserEntity>)

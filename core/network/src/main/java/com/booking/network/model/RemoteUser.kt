@@ -3,7 +3,7 @@ package com.booking.network.model
 import com.google.gson.annotations.SerializedName
 
 data class RemoteUser(
-    var userId: String,
+//    var userId: String,
     @SerializedName("user_name")
     val userName: StringValue,
     @SerializedName("user_email")

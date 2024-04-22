@@ -7,7 +7,7 @@ import com.booking.network.model.RemoteBookedMeetingRooms
 import com.booking.network.model.RemoteMeetingRoom
 
 fun RemoteBookedMeetingRooms.asEntity() = BookedMeetingRoomEntity(
-    meetingRoomBookID = meetingRoomBookingID,
+    meetingRoomBookID = getMeetingRoomBookingID(),
     meetingRoomID = getMeetingRoomID(),
     fromTime = getFromTime(),
     toTime = getToTime(),

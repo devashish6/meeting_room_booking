@@ -6,7 +6,6 @@ import com.booking.database.dao.UsersDao
 import com.booking.database.model.BookedMeetingRoomEntity
 import com.booking.database.model.MeetingRoomEntity
 import com.booking.database.model.UserEntity
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class LocalDataSource @Inject constructor(
@@ -26,8 +25,8 @@ class LocalDataSource @Inject constructor(
         return usersDao.getAllUsers()
     }
 
-    override suspend fun getUserByUserID(userID: String): UserEntity {
-        return usersDao.getUserByID(userID)
+    override suspend fun getUserByEmail(userEmail: String): UserEntity {
+        return usersDao.getUserByEmail(userEmail)
     }
 
     override suspend fun getAllMeetingRooms(): List<MeetingRoomEntity> {

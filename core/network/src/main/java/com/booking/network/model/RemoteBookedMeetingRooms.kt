@@ -3,7 +3,8 @@ package com.booking.network.model
 import com.google.gson.annotations.SerializedName
 
 data class RemoteBookedMeetingRooms(
-    var meetingRoomBookingID : String,
+    @SerializedName("meeting_room_booking_id")
+    var meetingRoomBookingID : StringValue,
     @SerializedName("from_time")
     val fromTime: StringValue,
     @SerializedName("to_time")
@@ -19,6 +20,9 @@ data class RemoteBookedMeetingRooms(
     @SerializedName("attendees")
     val attendees: ArrayValue,
 ) {
+    fun getMeetingRoomBookingID() : String {
+        return meetingRoomBookingID.stringValue
+    }
     fun getFromTime() : String {
         return fromTime.stringValue
     }
@@ -38,7 +42,9 @@ data class RemoteBookedMeetingRooms(
         return date.stringValue
     }
     fun getAttendees() : List<String> {
-        return attendees.arrayValue
+        return attendees.arrayValue.values.map {stringValue ->
+            stringValue.stringValue
+        }
     }
 
 }

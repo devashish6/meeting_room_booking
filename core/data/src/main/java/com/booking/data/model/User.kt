@@ -6,7 +6,7 @@ import com.booking.network.model.FirebaseResponseFields
 import com.booking.network.model.RemoteUser
 
 fun RemoteUser.asEntity() = UserEntity(
-    id = userId,
+//    id = userId,
     email = getUserEmail(),
     name = getUserName(),
     password = getUserPassword()
