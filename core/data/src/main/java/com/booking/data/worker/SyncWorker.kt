@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.booking.data.model.asEntity
 import com.booking.data.repository.DataRepository
 import com.booking.database.com.booking.database.repository.LocalDataSource
 import com.booking.network.retrofit.RemoteDataSource

@@ -1,6 +1,7 @@
 package com.booking.data.model
 
 import com.booking.database.model.UserEntity
+import com.booking.model.model.User
 import com.booking.network.model.FirebaseDocument
 import com.booking.network.model.FirebaseResponseFields
 import com.booking.network.model.RemoteUser
@@ -10,6 +11,12 @@ fun RemoteUser.asEntity() = UserEntity(
     email = getUserEmail(),
     name = getUserName(),
     password = getUserPassword()
+)
+fun UserEntity.asDomainModel() = User(
+//    id = id,
+    email = email,
+    name = name,
+    password = password
 )
 /*
     1. We have firebase documents

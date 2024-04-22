@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.dagger.hilt)
     implementation(libs.androidx.hilt.common)
     implementation(libs.androidx.hilt.work)
+    implementation(project(":core:model"))
     kapt(libs.dagger.hilt.compiler)
 
     //Retrofit

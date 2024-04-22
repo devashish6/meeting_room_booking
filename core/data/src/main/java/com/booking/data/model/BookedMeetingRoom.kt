@@ -2,6 +2,7 @@ package com.booking.data.model
 
 import com.booking.database.model.BookedMeetingRoomEntity
 import com.booking.database.model.MeetingRoomEntity
+import com.booking.model.model.BookedMeetingRoom
 import com.booking.network.model.FirebaseDocument
 import com.booking.network.model.RemoteBookedMeetingRooms
 import com.booking.network.model.RemoteMeetingRoom
@@ -15,6 +16,16 @@ fun RemoteBookedMeetingRooms.asEntity() = BookedMeetingRoomEntity(
     date = getDate(),
     meetingTitle = getMeetingTitle(),
     attendees = getAttendees()
+)
+fun BookedMeetingRoomEntity.asDomainModel() = BookedMeetingRoom(
+    meetingRoomBookID = meetingRoomBookID,
+    meetingRoomID = meetingRoomID,
+    fromTime = fromTime,
+    toTime = toTime,
+    host = host,
+    date = date,
+    meetingTitle = meetingTitle,
+    attendees = attendees
 )
 
 
