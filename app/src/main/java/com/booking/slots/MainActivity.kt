@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.booking.booking.BookingScreen
+import com.booking.dashboard.ui.theme.DashboardScreen
 import com.booking.slots.ui.theme.SlotsTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
@@ -40,10 +42,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             SlotsTheme {
-                DatePicker(onDateSelected = {}) {
-
-
-                }
+//                DatePicker(onDateSelected = {}) {
+//
+//
+//                }
+                BookingScreen()
             }
         }
     }

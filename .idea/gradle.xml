@@ -23,6 +23,7 @@
             <option value="$PROJECT_DIR$/feature/booking" />
             <option value="$PROJECT_DIR$/feature/confirm" />
             <option value="$PROJECT_DIR$/feature/dashboard" />
+            <option value="$PROJECT_DIR$/feature/home" />
             <option value="$PROJECT_DIR$/feature/login" />
             <option value="$PROJECT_DIR$/feature/registration" />
           </set>

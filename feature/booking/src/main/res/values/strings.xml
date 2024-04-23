@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="meeting_title">Meeting Title</string>
+    <string name="from_time">"From Time : "</string>
+    <string name="to_time">"To Time : "</string>
+    <string name="book_meeting">Book Meeting</string>
+    <string name="select_time">Select Time</string>
+</resources>
