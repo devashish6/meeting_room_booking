@@ -18,6 +18,21 @@ fun convertToCustomFormat(hashMap: HashMap<String, String>): JsonObject {
     return output
 }
 
+fun convertToFormat(hashMap: HashMap<String, String>): HashMap<String, String> {
+    var output = HashMap<String, String>()
+    val fields = JsonObject()
+
+    for ((key, value) in hashMap) {
+        val fieldValue = JsonObject()
+        fieldValue.addProperty("stringValue", value)
+        fields.add(key, fieldValue)
+    }
+
+    output["fields"] = fields.toString()
+
+    return output
+}
+
 fun convertToJsonWithFields(jsonObject: JsonObject): JsonObject {
     val fieldsObject = JsonObject()
 

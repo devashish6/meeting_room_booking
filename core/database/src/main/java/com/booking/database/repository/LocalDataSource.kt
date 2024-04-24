@@ -21,15 +21,15 @@ class LocalDataSource @Inject constructor(
         usersDao.addUsers(users)
     }
 
-    override suspend fun getAllUsers(): List<UserEntity> {
+    override suspend fun getAllUsers(): List<UserEntity?> {
         return usersDao.getAllUsers()
     }
 
-    override suspend fun getUserByEmail(userEmail: String): UserEntity {
+    override suspend fun getUserByEmail(userEmail: String): UserEntity? {
         return usersDao.getUserByEmail(userEmail)
     }
 
-    override suspend fun getAllMeetingRooms(): List<MeetingRoomEntity> {
+    override suspend fun getAllMeetingRooms(): List<MeetingRoomEntity?> {
         return meetingRoomDao.getAllMeetingRooms()
     }
 
@@ -37,11 +37,11 @@ class LocalDataSource @Inject constructor(
         return meetingRoomDao.addMeetingRooms(meetingRooms)
     }
 
-    override suspend fun getMeetingRoomByID(meetingRoomID: String): MeetingRoomEntity {
+    override suspend fun getMeetingRoomByID(meetingRoomID: String): MeetingRoomEntity? {
         return meetingRoomDao.getMeetingRoomByID(meetingRoomID)
     }
 
-    override suspend fun getBookedMeetingRooms(): List<BookedMeetingRoomEntity> {
+    override suspend fun getBookedMeetingRooms(): List<BookedMeetingRoomEntity?> {
         return bookingMeetingRoomDao.getBookedMeetingRooms()
     }
 

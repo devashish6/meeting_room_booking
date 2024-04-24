@@ -45,9 +45,12 @@ android {
 dependencies {
     //Project dependencies
     implementation(project(":core:designsystem"))
+    implementation(project(":core:data"))
+    implementation(project(":core:model"))
 
     //Dagger
     implementation(libs.dagger.hilt)
+    implementation(libs.androidx.hilt.navigation)
     implementation(libs.androidx.hilt.common)
     implementation(libs.androidx.hilt.work)
     kapt(libs.dagger.hilt.compiler)
@@ -59,6 +62,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.core.i18n)
 
     //compose-test

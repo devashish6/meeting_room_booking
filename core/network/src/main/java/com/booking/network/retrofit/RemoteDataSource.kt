@@ -5,13 +5,14 @@ import com.booking.network.model.FirebaseResponseFields
 import com.booking.network.model.RemoteBookedMeetingRooms
 import com.booking.network.model.RemoteMeetingRoom
 import com.booking.network.model.RemoteUser
+import com.google.gson.JsonObject
 import retrofit2.Response
 import javax.inject.Inject
 
 class RemoteDataSource @Inject constructor(
     private val apiService: ApiService
 ) : ApiService {
-    override suspend fun createUser(user: HashMap<String, String>): FirebaseResponseFields<RemoteUser> {
+    override suspend fun createUser(user: JsonObject): FirebaseResponseFields<RemoteUser>? {
         return apiService.createUser(user)
     }
 
@@ -27,8 +28,8 @@ class RemoteDataSource @Inject constructor(
         return apiService.getAllMeetingRooms()
     }
 
-    override suspend fun bookMeetingRoom(user: HashMap<String, Any>): FirebaseResponseFields<RemoteBookedMeetingRooms> {
-        return apiService.bookMeetingRoom(user)
+    override suspend fun bookMeetingRoom(meetingRoom: JsonObject): FirebaseResponseFields<RemoteBookedMeetingRooms> {
+        return apiService.bookMeetingRoom(meetingRoom)
     }
 
     override suspend fun getUserByUserID(userID: String): FirebaseResponseFields<RemoteUser> {

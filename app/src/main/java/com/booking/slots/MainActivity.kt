@@ -28,8 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.booking.booking.BookingScreen
-import com.booking.dashboard.ui.theme.DashboardScreen
+import com.booking.login.LoginRoute
+import com.booking.registration.RegistrationRoute
+import com.booking.slots.navigation.NavigationHost
+import com.booking.slots.navigation.Routes
 import com.booking.slots.ui.theme.SlotsTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
@@ -41,13 +43,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SlotsTheme {
+            val startDestination = Routes.Home.route
+            NavigationHost()
+//            SlotsTheme {
 //                DatePicker(onDateSelected = {}) {
 //
 //
 //                }
-                BookingScreen()
-            }
+//                RegistrationRoute(onSuccessfulRegistration = {})
+//            }
         }
     }
 }

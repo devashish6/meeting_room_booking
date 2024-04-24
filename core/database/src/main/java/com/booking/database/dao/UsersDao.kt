@@ -12,10 +12,10 @@ interface UsersDao {
     suspend fun addUser(user: UserEntity)
 
     @Query("SELECT * from users")
-    suspend fun getAllUsers() : List<UserEntity>
+    suspend fun getAllUsers() : List<UserEntity?>
 
     @Query("SELECT * FROM users WHERE email = :key")
-    suspend fun getUserByEmail(key: String) : UserEntity
+    suspend fun getUserByEmail(key: String) : UserEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addUsers(users: List<UserEntity>)

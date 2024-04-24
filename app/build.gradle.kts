@@ -63,6 +63,10 @@ dependencies {
     implementation(project(":feature:dashboard"))
     implementation(project(":feature:dashboard"))
     implementation(project(":feature:booking"))
+    implementation(project(":feature:login"))
+    implementation(project(":feature:registration"))
+    implementation(project(":feature:home"))
+    implementation(project(":feature:confirm"))
     kapt(libs.dagger.hilt.compiler)
 
     //Worker

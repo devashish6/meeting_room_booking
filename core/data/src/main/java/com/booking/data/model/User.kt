@@ -29,3 +29,6 @@ fun FirebaseDocument<RemoteUser>.asListOfUserEntity(): List<UserEntity> {
         firebaseResponseFields.fields.asEntity()
     }
 }
+//fun List<UserEntity>.asListOfUser(): List<User> {
+//
+//}

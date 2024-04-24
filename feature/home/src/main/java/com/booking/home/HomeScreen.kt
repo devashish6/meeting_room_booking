@@ -17,7 +17,10 @@ import androidx.compose.ui.unit.dp
 import com.booking.designsystem.component.ComponentButton
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    navigateToLogin : () -> Unit,
+    navigateToRegister : () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -26,11 +29,11 @@ fun HomeScreen() {
         horizontalArrangement = Arrangement.Center
     ) {
         ComponentButton(
-            onClick = {/*TODO*/ },
+            onClick = {navigateToLogin.invoke() },
             modifier = Modifier.padding(25.dp),
             text = stringResource(id = R.string.home_login))
         ComponentButton(
-            onClick = {/*TODO*/ },
+            onClick = {navigateToRegister.invoke() },
             modifier = Modifier.padding(25.dp),
             text = stringResource(id = R.string.home_register))
     }
@@ -40,5 +43,5 @@ fun HomeScreen() {
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
-    HomeScreen()
+    HomeScreen({}, {})
 }

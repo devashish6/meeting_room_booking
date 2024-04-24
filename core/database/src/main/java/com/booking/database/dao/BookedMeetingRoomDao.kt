@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface BookedMeetingRoomDao {
     @Query("SELECT * from meeting_room_booking")
-    suspend fun getBookedMeetingRooms() : List<BookedMeetingRoomEntity>
+    suspend fun getBookedMeetingRooms() : List<BookedMeetingRoomEntity?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addBookedMeetingRooms(users: List<BookedMeetingRoomEntity>)
