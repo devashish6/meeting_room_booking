@@ -21,6 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.booking.designsystem.component.ComponentButton
 import com.booking.designsystem.component.FormFields
+import com.booking.ui.Loading
 
 const val TAG = "LOGIN_SCREEN_DEBUG"
 @Composable
@@ -73,16 +74,17 @@ fun LoginScreen(
             onClick =
             {
                 loginValidation(email, password)
-                when(loginUiState) {
-                    is LoginUiState.Success -> onSuccessfulLogin.invoke()
-                    is LoginUiState.InvalidEmailID -> TODO() //show a toast
-                    is LoginUiState.InvalidCredentials -> TODO() //show a toast
-                    is LoginUiState.None -> Log.e(TAG, "LoginScreen: ")
-                }
             },
             text = stringResource(id = R.string.login_login),
             modifier = Modifier.padding(top = 40.dp)
         )
+        when(loginUiState) {
+            is LoginUiState.Loading -> Loading()
+            is LoginUiState.Success -> onSuccessfulLogin.invoke()
+            is LoginUiState.InvalidEmailID -> TODO() //show a toast
+            is LoginUiState.InvalidCredentials -> TODO() //show a toast
+            is LoginUiState.None -> Log.e(TAG, "LoginScreen: ")
+        }
     }
 }
 

@@ -47,6 +47,7 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:data"))
     implementation(project(":core:model"))
+    implementation(project(":core:ui"))
 
     //Dagger
     implementation(libs.dagger.hilt)

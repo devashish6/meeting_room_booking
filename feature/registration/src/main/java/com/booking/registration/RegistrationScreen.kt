@@ -21,6 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.booking.designsystem.component.ComponentButton
 import com.booking.designsystem.component.FormFields
+import com.booking.ui.Loading
 
 private val TAG = "REGISTRATION_SCREEN_DEBUG"
 @Composable
@@ -87,17 +88,18 @@ fun RegistrationScreen(
             onClick =
             {
                 onRegistrationClick(name, email, password, confirmPassword)
-                Log.d(TAG, "RegistrationScreen: $registrationUiState")
-                when (registrationUiState) {
-                    is RegistrationUiState.Success -> onSuccessfulRegistration.invoke()
-                    is RegistrationUiState.InvalidEmailID -> {}// TODO() //show toast
-                    is RegistrationUiState.AccountAlreadyExists -> {}// TODO() //show toast
-                    is RegistrationUiState.PasswordMismatch -> {}//TODO() //show toast
-                    is RegistrationUiState.None -> {}
-                }
             },
             text = stringResource(id = R.string.register_confirm),
             modifier = Modifier.padding(top = 40.dp))
+        Log.d(TAG, "RegistrationScreen: $registrationUiState")
+        when (registrationUiState) {
+            is RegistrationUiState.Loading -> {Loading()}
+            is RegistrationUiState.Success -> onSuccessfulRegistration.invoke()
+            is RegistrationUiState.InvalidEmailID -> {}// TODO() //show toast
+            is RegistrationUiState.AccountAlreadyExists -> {}// TODO() //show toast
+            is RegistrationUiState.PasswordMismatch -> {}//TODO() //show toast
+            is RegistrationUiState.None -> {}
+        }
     }
 
 }

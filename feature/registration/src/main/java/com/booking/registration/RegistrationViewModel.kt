@@ -23,6 +23,7 @@ class RegistrationViewModel @Inject constructor(
         get() = _registrationUiState
 
     fun registerUser(name: String, email: String, password: String, confirmedPassword: String) {
+        _registrationUiState.value = RegistrationUiState.Loading
         if (!email.contains("@") || !email.endsWith(".com")) {
             _registrationUiState.value = RegistrationUiState.InvalidEmailID
             Log.d(TAG, "registerUser: ${registrationUiState.value}")

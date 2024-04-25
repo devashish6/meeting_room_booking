@@ -6,5 +6,6 @@ sealed interface LoginUiState {
     data class Success(val user: User) : LoginUiState
     data object InvalidCredentials : LoginUiState
     data object InvalidEmailID : LoginUiState
+    data object Loading : LoginUiState
     data object None : LoginUiState
 }

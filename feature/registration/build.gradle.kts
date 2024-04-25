@@ -47,13 +47,14 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:data"))
     implementation(project(":core:model"))
+    implementation(project(":core:data"))
+    implementation(project(":core:ui"))
 
     //Dagger
     implementation(libs.dagger.hilt)
     implementation(libs.androidx.hilt.navigation)
     implementation(libs.androidx.hilt.common)
     implementation(libs.androidx.hilt.work)
-    implementation(project(":core:data"))
 
     kapt(libs.dagger.hilt.compiler)
 
