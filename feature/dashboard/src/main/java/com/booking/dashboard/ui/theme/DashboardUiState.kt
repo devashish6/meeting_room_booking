@@ -10,19 +10,19 @@ import java.util.stream.Stream
 
 //interface DashboardUiState {
 data class CalendarDates(
-    val selectedDate: Date,
-    val visibleDates: List<Date>
+    var selectedDate: Date,
+    var visibleDates: List<Date>
 ) {
-    val firstDate = visibleDates.first()
-    val lastDate = visibleDates.last()
+    var firstDate = visibleDates.first()
+    var lastDate = visibleDates.last()
 
     data class Date(
-        val date: LocalDate,
-        val isSelected: Boolean,
+        var date: LocalDate,
+        var isSelected: Boolean,
         val isToday: Boolean
     ) {
-        val day: String = date.format(DateTimeFormatter.ofPattern("E"))
-        val month: String =
+        var day: String = date.format(DateTimeFormatter.ofPattern("E"))
+        var month: String =
             date.month.getDisplayName(TextStyle.SHORT_STANDALONE, Locale.ENGLISH)
     }
 }

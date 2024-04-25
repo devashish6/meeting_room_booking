@@ -13,7 +13,7 @@ import com.booking.registration.RegistrationRoute
 
 @Composable
 fun NavigationHost(
-    startDestination: String = Routes.Home.route
+    startDestination: String = Routes.Dashboard.route
 ) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = startDestination) {
