@@ -20,13 +20,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -53,57 +48,61 @@ private const val TAG = "DASHBOARD_SCREEN_DEBUG"
 
 @Composable
 fun DashboardScreen() {
+    var dates by remember {
+        mutableStateOf(getDates(lastSelectedDate = LocalDate.now()))
+    }
     Column {
-
-        DatePickerHeader()
+        CalendarPickerBar(
+            headerDate = dates.selectedDate.date
+        ) {
+            dates.selectedDate.date = it
+            dates = getDates(lastSelectedDate = it)
+        }
+        DatePickerHeader(
+            dates = dates,
+            onDateClickListener = { date ->
+                dates = dates.copy(
+                    selectedDate = date,
+                    visibleDates = dates.visibleDates.map {
+                        it.copy(isSelected = it.date.isEqual(date.date))
+                    }
+                )
+            }
+        )
         SlotsBooked(hourHeight = 64.dp)
     }
 }
 
 @Composable
-fun calendarPickerBar(headerDate: LocalDate): LocalDate {
+fun CalendarPickerBar(
+    headerDate: LocalDate,
+    updateSelectedDate: (LocalDate) -> Unit
+) {
     var showDialog by remember {
         mutableStateOf(false)
     }
-    Log.d(TAG,"in calendar picker $headerDate")
-    val dates = remember(headerDate) {
-        mutableStateOf(headerDate)
-    }
-    Log.d(TAG,"in calendar picker dates $dates")
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        IconButton(
-            onClick = {}) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = "Back"
-            )
-        }
         Text(
-            text = dates.value.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy")),
+            text = headerDate.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy")),
+            style = MaterialTheme.typography.labelLarge,
             modifier = Modifier
-                .align(Alignment.CenterVertically)
                 .clickable {
                     showDialog = true
                 }
         )
-        IconButton(onClick = {}) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "Next"
-            )
-        }
     }
     if (showDialog) {
         DatePicker(
-            onDateSelected = { dates.value = it },
+            onDateSelected = { updateSelectedDate(it) },
             onDismissRequest = { showDialog = false },
-            selectedDate = dates.value)
+            selectedDate = headerDate
+        )
     }
-    Log.d(TAG, "calendarPickerBar: ${dates.value}")
-    return dates.value
 }
 
 @Composable
@@ -211,15 +210,11 @@ fun CustomCalendarView(onDateSelected: (LocalDate) -> Unit) {
 }
 
 @Composable
-fun DatePickerHeader() {
-    var dates by remember {
-        mutableStateOf(getDates(lastSelectedDate = LocalDate.now()))
-    }
-    Log.d(TAG, "dates in date picker: ${dates.selectedDate}")
-    val calendarPickedDate = calendarPickerBar(dates.selectedDate.date)
-    dates = getDates(startDate = calendarPickedDate, lastSelectedDate = calendarPickedDate)
+fun DatePickerHeader(
+    dates: CalendarDates,
+    onDateClickListener: (CalendarDates.Date) -> Unit
+) {
     Column {
-        Log.d(TAG, "DatePickerHeader: $calendarPickedDate")
         Log.d(TAG, "DatePickerHeader-2: $dates")
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 60.dp),
@@ -228,21 +223,10 @@ fun DatePickerHeader() {
             items(dates.visibleDates.size) { index ->
                 DateItem(
                     date = dates.visibleDates[index],
-                    onDateClickListener = { date ->
-                        Log.d(TAG, "DatePickerHeader: $date")
-                        dates = dates.copy(
-                            selectedDate = date,
-                            visibleDates = dates.visibleDates.map {
-                                Log.d(TAG, "DatePickerHeader: ")
-                                it.copy(isSelected = it.date.isEqual(date.date))
-                            }
-                        )
-                        Log.d(TAG, "dates selected: ${dates.selectedDate}")
-                    }
+                    onDateClickListener = { onDateClickListener(it) }
                 )
             }
         }
-
     }
 }
 

@@ -28,10 +28,9 @@ data class CalendarDates(
 }
 
 fun getDates(
-    startDate: LocalDate = LocalDate.now(),
     lastSelectedDate: LocalDate
 ): CalendarDates {
-    val firstDayOfWeek = startDate.with(DayOfWeek.MONDAY)
+    val firstDayOfWeek = lastSelectedDate.with(DayOfWeek.MONDAY)
     val endDayOfWeek = firstDayOfWeek.plusDays(5)
     val visibleDates = getDatesBetween(firstDayOfWeek, endDayOfWeek)
     return CalendarDates(
