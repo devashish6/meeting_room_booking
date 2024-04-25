@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.booking.ui.DatePicker
+import com.booking.ui.CustomCalendar
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -123,7 +123,7 @@ fun CalendarPickerBar(
         )
     }
     if (showDialog) {
-        DatePicker(
+        CustomCalendar(
             onDateSelected = { updateSelectedDate(it) },
             onDismissRequest = { showDialog = false },
             selectedDate = headerDate

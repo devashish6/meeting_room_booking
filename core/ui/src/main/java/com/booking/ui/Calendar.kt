@@ -30,7 +30,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
-fun DatePicker(
+fun CustomCalendar(
     onDateSelected: (LocalDate) -> Unit,
     onDismissRequest: () -> Unit,
     selectedDate: LocalDate

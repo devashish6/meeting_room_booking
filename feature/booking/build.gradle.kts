@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.hilt.common)
     implementation(libs.androidx.hilt.work)
     implementation(project(":core:designsystem"))
+    implementation(project(":core:ui"))
     kapt(libs.dagger.hilt.compiler)
 
     //compose

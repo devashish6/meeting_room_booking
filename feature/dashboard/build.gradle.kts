@@ -55,7 +55,6 @@ dependencies {
     implementation(libs.androidx.hilt.navigation)
     implementation(libs.androidx.hilt.common)
     implementation(libs.androidx.hilt.work)
-    implementation(project(":core:designsystem"))
     kapt(libs.dagger.hilt.compiler)
 
     //compose
