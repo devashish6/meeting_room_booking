@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.booking.booking.BookingScreen
 import com.booking.confirm.ConfirmationScreen
+import com.booking.dashboard.ui.theme.DashboardRoute
 import com.booking.dashboard.ui.theme.DashboardScreen
 import com.booking.home.HomeScreen
 import com.booking.login.LoginRoute
@@ -34,7 +35,7 @@ fun NavigationHost(
             )
         }
         composable(Routes.Dashboard.route) {
-            DashboardScreen()
+            DashboardRoute(navigateToBooking = {navController.navigate(Routes.Booking.route)})
         }
         composable(Routes.Booking.route) {
             BookingScreen()

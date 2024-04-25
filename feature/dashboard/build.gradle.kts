@@ -45,6 +45,10 @@ android {
 dependencies {
     //Project dependencies
     implementation(project(":core:designsystem"))
+    implementation(project(":core:data"))
+    implementation(project(":core:model"))
+    implementation(project(":core:data"))
+    implementation(project(":core:ui"))
 
     //Dagger
     implementation(libs.dagger.hilt)
@@ -61,6 +65,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.core.i18n)
 
     //compose-test
