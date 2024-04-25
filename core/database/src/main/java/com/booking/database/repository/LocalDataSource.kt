@@ -45,6 +45,10 @@ class LocalDataSource @Inject constructor(
         return bookingMeetingRoomDao.getBookedMeetingRooms()
     }
 
+    override suspend fun getBookingsForDate(date: String): List<BookedMeetingRoomEntity?> {
+        return bookingMeetingRoomDao.getBookingsForDate(date)
+    }
+
     override suspend fun addBookedMeetingRooms(bookedMeetingRooms: List<BookedMeetingRoomEntity>) {
         return bookingMeetingRoomDao.addBookedMeetingRooms(bookedMeetingRooms)
     }

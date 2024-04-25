@@ -10,6 +10,7 @@ interface LocalDataSourceInterface {
     suspend fun addUsers(users: List<UserEntity>)
     suspend fun getAllUsers() : List<UserEntity?>
     suspend fun getBookedMeetingRooms() : List<BookedMeetingRoomEntity?>
+    suspend fun getBookingsForDate(date: String) : List<BookedMeetingRoomEntity?>
     suspend fun addBookedMeetingRooms(bookedMeetingRooms: List<BookedMeetingRoomEntity>)
     suspend fun getAllMeetingRooms() : List<MeetingRoomEntity?>
     suspend fun addMeetingRooms(meetingRooms: List<MeetingRoomEntity>)

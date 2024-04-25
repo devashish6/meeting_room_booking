@@ -122,4 +122,13 @@ class DataRepository @Inject constructor(
             false
         }
     }
+
+    suspend fun markTimeSlots (date : String) {
+        val bookings = localDataSourceInterface.getBookingsForDate(date)
+        if (bookings.isNotEmpty()) {
+            _offlineBookedMeetingRooms.emit(bookings)
+            _bookedMeetingRooms.emit(bookings.map { it?.asDomainModel() })
+            Log.d(TAG, "markTimeSlots: ${_bookedMeetingRooms.value}")
+        }
+    }
 }
