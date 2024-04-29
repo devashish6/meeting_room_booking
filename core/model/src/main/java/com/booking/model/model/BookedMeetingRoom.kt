@@ -8,5 +8,8 @@ data class BookedMeetingRoom(
     var host: String,
     var date: String,
     var meetingTitle: String,
-    var attendees: List<String>
+    var attendees: List<String>,
+    val col: Int = 0,
+    val colSpan: Int = 1,
+    val colTotal: Int = 1
 )
