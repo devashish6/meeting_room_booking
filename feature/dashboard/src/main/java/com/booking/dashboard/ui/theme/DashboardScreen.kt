@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +44,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import kotlin.math.log
 import kotlin.math.roundToInt
 
 private const val TAG = "DASHBOARD_SCREEN_DEBUG"
@@ -52,7 +54,7 @@ fun DashboardRoute(
     viewModel: DashboardViewModel = hiltViewModel(),
     navigateToBooking: () -> Unit
 ) {
-    val dashboardUiState = viewModel.dashboardUiState.collectAsStateWithLifecycle()
+    val dashboardUiState = viewModel.dashboardUiState.collectAsState()
     DashboardScreen(
         dashboardUiState = dashboardUiState.value,
         fetchMeetingsForTheDate = { viewModel.getBookedTimeslots(it) },
@@ -69,8 +71,9 @@ fun DashboardScreen(
     var dates by remember {
         mutableStateOf(getDates(lastSelectedDate = LocalDate.now()))
     }
-    Log.d(TAG, "DashboardScreen: ${dates.selectedDate.date.toIso()}")
-    fetchMeetingsForTheDate(dates.selectedDate.date.toIso())
+    Log.d(TAG, "DashboardScreen: ${dates.selectedDate.date}")
+    Log.d(TAG, "DashboardScreen: fetching slots from screen")
+    fetchMeetingsForTheDate(dates.selectedDate.date.toString())
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -87,7 +90,8 @@ fun DashboardScreen(
                 headerDate = dates.selectedDate.date
             ) {
                 dates.selectedDate.date = it
-                fetchMeetingsForTheDate(it.toIso())
+                Log.d(TAG, "DashboardScreen: fetching data after change in date from calendar")
+                fetchMeetingsForTheDate(it.toString())
                 dates = getDates(lastSelectedDate = it)
             }
             DatePickerHeader(
@@ -99,10 +103,31 @@ fun DashboardScreen(
                             it.copy(isSelected = it.date.isEqual(date.date))
                         }
                     )
-                    fetchMeetingsForTheDate(date.date.toIso())
+                    Log.d(TAG, "DashboardScreen: fetching data from date picker click")
+                    fetchMeetingsForTheDate(date.date.toString())
                 }
             )
-            MeetingSchedule(bookedMeetingRoom = bookedMeetings)
+            Row {
+                ScheduleSidebar(
+                    hourHeight = 64.dp,
+                    modifier = Modifier.padding(end = 24.dp),
+                    label = { BasicSidebarLabel(time = it) }
+                )
+                when (dashboardUiState) {
+                    is DashboardUiState.Success -> {
+                        BasicMeetingSchedule(
+                            bookedMeetingRoom = dashboardUiState.bookedMeetings,
+                            eventContent = {BasicEvent(bookedMeetingRoom = it)},
+                            modifier = Modifier
+                                .weight(1f)
+                                .verticalScroll(rememberScrollState())
+                        )
+                    }
+                    is DashboardUiState.Loading -> {}
+                    is DashboardUiState.None -> {}
+                }
+
+            }
         }
     }
 }
@@ -122,7 +147,7 @@ fun CalendarPickerBar(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = headerDate.toIso(),
+            text = headerDate.toString(),
             style = MaterialTheme.typography.labelLarge,
             modifier = Modifier
                 .clickable {
@@ -276,38 +301,6 @@ fun BasicEvent(
 }
 
 @Composable
-fun MeetingSchedule(
-    bookedMeetingRoom: List<BookedMeetingRoom>,
-    modifier: Modifier = Modifier,
-    eventContent: @Composable (bookedMeetingRoom: BookedMeetingRoom) -> Unit = {
-        BasicEvent(
-            bookedMeetingRoom = it
-        )
-    }
-) {
-    Column(modifier = modifier) {
-        Row(
-            modifier = Modifier
-                .weight(1f)
-                .align(Alignment.Start)
-        ) {
-            ScheduleSidebar(
-                hourHeight = 64.dp,
-                modifier = Modifier.padding(end = 24.dp),
-                label = { BasicSidebarLabel(time = it) }
-            )
-            BasicMeetingSchedule(
-                bookedMeetingRoom = bookedMeetingRoom,
-                eventContent = eventContent,
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-            )
-        }
-    }
-}
-
-@Composable
 fun BasicMeetingSchedule(
     bookedMeetingRoom: List<BookedMeetingRoom>,
     modifier: Modifier = Modifier,
@@ -431,36 +424,3 @@ private fun List<BookedMeetingRoom>.timesOverlapWith(event: BookedMeetingRoom): 
 fun SchedulePreview() {
     DashboardScreen()
 }
-
-val bookedMeetings = listOf(
-    BookedMeetingRoom(
-        meetingRoomBookID = "",
-        meetingRoomID = "",
-        fromTime = "10",
-        toTime = "11",
-        host = "",
-        date = "",
-        meetingTitle = "Hello world",
-        attendees = listOf("", "", "")
-    ),
-    BookedMeetingRoom(
-        meetingRoomBookID = "",
-        meetingRoomID = "",
-        fromTime = "10",
-        toTime = "11",
-        host = "",
-        date = "",
-        meetingTitle = "world",
-        attendees = listOf("", "", "")
-    ),
-    BookedMeetingRoom(
-        meetingRoomBookID = "",
-        meetingRoomID = "",
-        fromTime = "13",
-        toTime = "15",
-        host = "",
-        date = "",
-        meetingTitle = "Hello world",
-        attendees = listOf("", "", "")
-    )
-)
