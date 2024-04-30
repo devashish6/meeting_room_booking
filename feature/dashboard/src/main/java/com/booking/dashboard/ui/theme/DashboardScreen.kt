@@ -24,7 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,11 +39,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.booking.model.model.BookedMeetingRoom
 import com.booking.ui.CustomCalendar
+import com.booking.ui.Loading
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import kotlin.math.log
 import kotlin.math.roundToInt
 
 private const val TAG = "DASHBOARD_SCREEN_DEBUG"
@@ -54,11 +53,20 @@ fun DashboardRoute(
     viewModel: DashboardViewModel = hiltViewModel(),
     navigateToBooking: () -> Unit
 ) {
-    val dashboardUiState = viewModel.dashboardUiState.collectAsState()
+    val dashboardUiState = viewModel.dashboardUiState.collectAsStateWithLifecycle()
+//    viewModel.createBookingUiState()
+    val bookingsUiState = viewModel.bookingUiState.collectAsStateWithLifecycle(
+        BookingsUiState("",
+            listOf()
+        )
+    )
+    val bookedMeetingRooms = viewModel.bookedMeetings.collectAsStateWithLifecycle()
     DashboardScreen(
         dashboardUiState = dashboardUiState.value,
-        fetchMeetingsForTheDate = { viewModel.getBookedTimeslots(it) },
-        navigateToBooking = navigateToBooking
+        fetchMeetingsForTheDate = { viewModel.getBookedTimeslots() },
+        updateSelectedDate = { viewModel.selectedDate.value = it },
+        navigateToBooking = navigateToBooking,
+        bookedMeetingRooms = bookingsUiState.value.bookedSlots
     )
 }
 
@@ -66,13 +74,16 @@ fun DashboardRoute(
 fun DashboardScreen(
     dashboardUiState: DashboardUiState = DashboardUiState.None,
     fetchMeetingsForTheDate: (String) -> Unit = { _ -> },
-    navigateToBooking: () -> Unit = {}
+    updateSelectedDate: (String) -> Unit = { _ -> },
+    navigateToBooking: () -> Unit = {},
+    bookedMeetingRooms: List<BookedMeetingRoom>?
 ) {
     var dates by remember {
         mutableStateOf(getDates(lastSelectedDate = LocalDate.now()))
     }
     Log.d(TAG, "DashboardScreen: ${dates.selectedDate.date}")
     Log.d(TAG, "DashboardScreen: fetching slots from screen")
+    updateSelectedDate(dates.selectedDate.date.toString())
     fetchMeetingsForTheDate(dates.selectedDate.date.toString())
     Scaffold(
         floatingActionButton = {
@@ -87,8 +98,9 @@ fun DashboardScreen(
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             CalendarPickerBar(
-                headerDate = dates.selectedDate.date
+                headerDate = dates.selectedDate.date,
             ) {
+                updateSelectedDate(it.toString())
                 dates.selectedDate.date = it
                 Log.d(TAG, "DashboardScreen: fetching data after change in date from calendar")
                 fetchMeetingsForTheDate(it.toString())
@@ -103,6 +115,7 @@ fun DashboardScreen(
                             it.copy(isSelected = it.date.isEqual(date.date))
                         }
                     )
+                    updateSelectedDate(date.date.toString())
                     Log.d(TAG, "DashboardScreen: fetching data from date picker click")
                     fetchMeetingsForTheDate(date.date.toString())
                 }
@@ -116,14 +129,14 @@ fun DashboardScreen(
                 when (dashboardUiState) {
                     is DashboardUiState.Success -> {
                         BasicMeetingSchedule(
-                            bookedMeetingRoom = dashboardUiState.bookedMeetings,
+                            bookedMeetingRoom = bookedMeetingRooms ?: emptyList(),
                             eventContent = {BasicEvent(bookedMeetingRoom = it)},
                             modifier = Modifier
                                 .weight(1f)
                                 .verticalScroll(rememberScrollState())
                         )
                     }
-                    is DashboardUiState.Loading -> {}
+                    is DashboardUiState.Loading -> {Loading()}
                     is DashboardUiState.None -> {}
                 }
 
@@ -422,5 +435,5 @@ private fun List<BookedMeetingRoom>.timesOverlapWith(event: BookedMeetingRoom): 
 @Preview(showBackground = true)
 @Composable
 fun SchedulePreview() {
-    DashboardScreen()
+    DashboardScreen(bookedMeetingRooms = emptyList())
 }

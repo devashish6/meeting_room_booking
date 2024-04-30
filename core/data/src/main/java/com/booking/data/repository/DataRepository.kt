@@ -21,7 +21,7 @@ import javax.inject.Inject
 class DataRepository @Inject constructor(
     private val localDataSourceInterface: LocalDataSourceInterface,
     private val remoteDataSource: RemoteDataSource
-)  {
+) {
     private val TAG = "DataRepository_DEBUG"
 
     private val _offlineUsers = MutableStateFlow<List<UserEntity?>>(emptyList())

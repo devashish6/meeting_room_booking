@@ -8,5 +8,4 @@ interface DashboardUiState {
     data object Loading : DashboardUiState
     data object None : DashboardUiState
 
-
 }
