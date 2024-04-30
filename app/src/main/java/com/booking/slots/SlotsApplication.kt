@@ -2,6 +2,7 @@ package com.booking.slots
 
 import android.app.Application
 import androidx.work.Configuration
+import androidx.work.WorkManager
 import com.booking.data.worker.SyncWorkerFactory
 import com.booking.data.worker.initializeWorker
 import dagger.hilt.android.HiltAndroidApp
@@ -14,7 +15,7 @@ class SlotsApplication : Application(), Configuration.Provider {
     lateinit var hiltWorkerFactory: SyncWorkerFactory
     override fun onCreate() {
         super.onCreate()
-        initializeWorker(this)
+        initializeWorker(WorkManager.getInstance(this))
     }
 
     override val workManagerConfiguration: Configuration

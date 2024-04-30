@@ -3,12 +3,7 @@ package com.booking.login
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.WorkManager
 import com.booking.data.repository.DataRepository
-import com.booking.data.worker.SyncWorker
-import com.booking.data.worker.initializeWorker
-import com.booking.data.worker.workerRequest
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

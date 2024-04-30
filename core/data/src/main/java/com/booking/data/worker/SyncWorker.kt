@@ -33,4 +33,5 @@ class SyncWorker @AssistedInject constructor(
             Result.retry()
         }
     }
+
 }

@@ -9,8 +9,8 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 
-fun initializeWorker(context: Context) {
-    WorkManager.getInstance(context)
+fun initializeWorker(workManager: WorkManager) {
+    workManager
         .enqueueUniqueWork(
         "SyncWorkName",
         ExistingWorkPolicy.KEEP,

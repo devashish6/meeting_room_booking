@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val startDestination = Routes.Dashboard.route
-            NavigationHost()
+            NavigationHost(startDestination = startDestination)
 //            SlotsTheme {
 //                RegistrationRoute(onSuccessfulRegistration = {})
 //            }

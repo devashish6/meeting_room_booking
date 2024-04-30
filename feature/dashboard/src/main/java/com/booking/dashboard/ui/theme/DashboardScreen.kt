@@ -54,11 +54,13 @@ fun DashboardRoute(
     viewModel: DashboardViewModel = hiltViewModel(),
     navigateToBooking: () -> Unit
 ) {
-    val dashboardUiState = viewModel.dashboardUiState.collectAsState()
+    val dashboardUiState = viewModel.dashboardUiState.collectAsStateWithLifecycle()
+    val bookedMeetingRoom = viewModel.bookedMeetingRooms.collectAsStateWithLifecycle()
     DashboardScreen(
         dashboardUiState = dashboardUiState.value,
         fetchMeetingsForTheDate = { viewModel.getBookedTimeslots(it) },
-        navigateToBooking = navigateToBooking
+        navigateToBooking = navigateToBooking,
+        bookedMeetingRoom = bookedMeetingRoom.value.filterNotNull()
     )
 }
 
@@ -66,7 +68,8 @@ fun DashboardRoute(
 fun DashboardScreen(
     dashboardUiState: DashboardUiState = DashboardUiState.None,
     fetchMeetingsForTheDate: (String) -> Unit = { _ -> },
-    navigateToBooking: () -> Unit = {}
+    navigateToBooking: () -> Unit = {},
+    bookedMeetingRoom : List<BookedMeetingRoom>
 ) {
     var dates by remember {
         mutableStateOf(getDates(lastSelectedDate = LocalDate.now()))
@@ -116,7 +119,7 @@ fun DashboardScreen(
                 when (dashboardUiState) {
                     is DashboardUiState.Success -> {
                         BasicMeetingSchedule(
-                            bookedMeetingRoom = dashboardUiState.bookedMeetings,
+                            bookedMeetingRoom = bookedMeetingRoom,
                             eventContent = {BasicEvent(bookedMeetingRoom = it)},
                             modifier = Modifier
                                 .weight(1f)
@@ -422,5 +425,5 @@ private fun List<BookedMeetingRoom>.timesOverlapWith(event: BookedMeetingRoom): 
 @Preview(showBackground = true)
 @Composable
 fun SchedulePreview() {
-    DashboardScreen()
+    DashboardScreen(bookedMeetingRoom = emptyList())
 }
