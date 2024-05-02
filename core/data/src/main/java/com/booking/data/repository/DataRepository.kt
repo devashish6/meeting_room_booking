@@ -21,38 +21,39 @@ import javax.inject.Inject
 class DataRepository @Inject constructor(
     private val localDataSourceInterface: LocalDataSourceInterface,
     private val remoteDataSource: RemoteDataSource
-)  {
+) {
     private val TAG = "DataRepository_DEBUG"
 
     private val _offlineUsers = MutableStateFlow<List<UserEntity?>>(emptyList())
     private val _offlineUser = MutableStateFlow<UserEntity?>(null)
     private val _offlineMeetingRooms = MutableStateFlow<List<MeetingRoomEntity?>>(emptyList())
-    private val _offlineBookedMeetingRooms = MutableStateFlow<List<BookedMeetingRoomEntity?>>(emptyList())
+    private val _offlineBookedMeetingRooms =
+        MutableStateFlow<List<BookedMeetingRoomEntity?>>(emptyList())
 
     private val _users = MutableStateFlow<List<User?>>(emptyList())
     private val _user = MutableStateFlow<User?>(null)
     private val _meetingRooms = MutableStateFlow<List<MeetingRoom?>>(emptyList())
     private val _bookedMeetingRooms = MutableStateFlow<List<BookedMeetingRoom?>>(emptyList())
 
-    val offlineUsers : StateFlow<List<UserEntity?>>
+    val offlineUsers: StateFlow<List<UserEntity?>>
         get() = _offlineUsers
 
-    val offlineMeetingRooms : StateFlow<List<MeetingRoomEntity?>>
+    val offlineMeetingRooms: StateFlow<List<MeetingRoomEntity?>>
         get() = _offlineMeetingRooms
 
-    val offlineBookedMeetings : StateFlow<List<BookedMeetingRoomEntity?>>
+    val offlineBookedMeetings: StateFlow<List<BookedMeetingRoomEntity?>>
         get() = _offlineBookedMeetingRooms
 
-    val users : StateFlow<List<User?>>
+    val users: StateFlow<List<User?>>
         get() = _users
 
-    val user : StateFlow<User?>
+    val user: StateFlow<User?>
         get() = _user
 
-    val meetingRooms : StateFlow<List<MeetingRoom?>>
+    val meetingRooms: StateFlow<List<MeetingRoom?>>
         get() = _meetingRooms
 
-    val bookedMeetingRooms : StateFlow<List<BookedMeetingRoom?>>
+    val bookedMeetingRooms: StateFlow<List<BookedMeetingRoom?>>
         get() = _bookedMeetingRooms
 
     suspend fun getAllUsers() {
@@ -108,7 +109,9 @@ class DataRepository @Inject constructor(
             _meetingRooms.emit(remoteMeetingRooms.asListOfMeetingRoomEntity().map { it.asDomainModel() })
             localDataSourceInterface.addBookedMeetingRooms(remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity())
             Log.d(TAG, "syncWith: adding booked meetings : ${remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity()}")
-            _bookedMeetingRooms.emit(remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity().map { it.asDomainModel() })
+            _bookedMeetingRooms.emit(
+                remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity()
+                    .map { it.asDomainModel() })
             true
         } catch (e: Exception) {
             Log.e(TAG, e.localizedMessage?.toString() ?: "")
@@ -128,23 +131,23 @@ class DataRepository @Inject constructor(
         }
     }
 
-    suspend fun createUser (name: String, emailID: String, password: String) : Boolean {
+    suspend fun createUser(name: String, emailID: String, password: String): Boolean {
         val userHashMap = HashMap<String, String>()
         userHashMap["user_email"] = emailID
         userHashMap["user_name"] = name
         userHashMap["user_password"] = password
-        Log.d(TAG, "createUser request body: "+ convertToCustomFormat(userHashMap).toString())
+        Log.d(TAG, "createUser request body: " + convertToCustomFormat(userHashMap).toString())
         return try {
             val user = remoteDataSource.createUser(convertToCustomFormat(userHashMap))
             Log.d(TAG, "createUser: $user")
             true
         } catch (e: Exception) {
-            Log.e(TAG, "createUser: ${e.localizedMessage}", )
+            Log.e(TAG, "createUser: ${e.localizedMessage}")
             false
         }
     }
 
-    suspend fun markTimeSlots (date : String) {
+    suspend fun markTimeSlots(date: String) {
         val bookings = localDataSourceInterface.getBookingsForDate(date)
         if (bookings.isNotEmpty()) {
             _offlineBookedMeetingRooms.emit(bookings)

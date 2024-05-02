@@ -81,8 +81,8 @@ fun LoginScreen(
         when(loginUiState) {
             is LoginUiState.Loading -> Loading()
             is LoginUiState.Success -> onSuccessfulLogin.invoke()
-            is LoginUiState.InvalidEmailID -> TODO() //show a toast
-            is LoginUiState.InvalidCredentials -> TODO() //show a toast
+            is LoginUiState.InvalidEmailID -> {} //show a toast
+            is LoginUiState.InvalidCredentials -> {} //show a toast
             is LoginUiState.None -> Log.e(TAG, "LoginScreen: ")
         }
     }

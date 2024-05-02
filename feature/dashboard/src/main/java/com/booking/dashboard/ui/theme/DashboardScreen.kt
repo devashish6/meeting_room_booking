@@ -24,7 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,13 +38,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.work.WorkInfo
 import com.booking.model.model.BookedMeetingRoom
 import com.booking.ui.CustomCalendar
+import com.booking.ui.Loading
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import kotlin.math.log
 import kotlin.math.roundToInt
 
 private const val TAG = "DASHBOARD_SCREEN_DEBUG"
@@ -54,49 +55,103 @@ fun DashboardRoute(
     viewModel: DashboardViewModel = hiltViewModel(),
     navigateToBooking: () -> Unit
 ) {
+    val workerStatus = viewModel.workerState.collectAsStateWithLifecycle()
     val dashboardUiState = viewModel.dashboardUiState.collectAsStateWithLifecycle()
     val bookedMeetingRoom = viewModel.bookedMeetingRooms.collectAsStateWithLifecycle()
+    Log.d(TAG, "DashboardScreen: worker status ${workerStatus.value}")
+
+    /*
+    Fetching Booked time slots when launching dashboard screen
+     */
+
+    LaunchedEffect(key1 = workerStatus.value) {
+        viewModel.getBookedTimeslots(LocalDate.now().toString())
+    }
     DashboardScreen(
+        workerStatus = workerStatus.value,
         dashboardUiState = dashboardUiState.value,
         fetchMeetingsForTheDate = { viewModel.getBookedTimeslots(it) },
         navigateToBooking = navigateToBooking,
         bookedMeetingRoom = bookedMeetingRoom.value.filterNotNull()
     )
+
 }
 
 @Composable
 fun DashboardScreen(
-    dashboardUiState: DashboardUiState = DashboardUiState.None,
+    workerStatus: WorkInfo.State,
+    dashboardUiState: DashboardUiState = DashboardUiState.Loading,
     fetchMeetingsForTheDate: (String) -> Unit = { _ -> },
     navigateToBooking: () -> Unit = {},
-    bookedMeetingRoom : List<BookedMeetingRoom>
+    bookedMeetingRoom: List<BookedMeetingRoom>
 ) {
+    /*
+    Keeps track of the latest selected date
+     */
+
     var dates by remember {
         mutableStateOf(getDates(lastSelectedDate = LocalDate.now()))
     }
-    Log.d(TAG, "DashboardScreen: ${dates.selectedDate.date}")
-    Log.d(TAG, "DashboardScreen: fetching slots from screen")
+
+    /*
+    Display the marked slots based on the UI State
+     */
+
+    var showSchedule by remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(key1 = workerStatus) {
+        fetchMeetingsForTheDate(dates.selectedDate.toString())
+    }
+
+    /*
+    Handling the UI State
+     */
+    when (dashboardUiState) {
+        is DashboardUiState.Success -> {
+            showSchedule = true
+        }
+
+        is DashboardUiState.Loading -> {
+            Loading()
+            Log.d(TAG, "DashboardScreen dashboardUiState loading: $dashboardUiState")
+        }
+
+        is DashboardUiState.None -> {
+            Log.d(TAG, "DashboardScreen dashboardUiState none: $dashboardUiState")
+        }
+    }
+
     fetchMeetingsForTheDate(dates.selectedDate.date.toString())
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navigateToBooking.invoke() },
-                modifier = Modifier
-                    .padding(16.dp)
+                modifier = Modifier.padding(16.dp)
             ) {
                 Text(text = "Book")
             }
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
+            /*
+            Calendar Title Bar
+             */
             CalendarPickerBar(
-                headerDate = dates.selectedDate.date
-            ) {
-                dates.selectedDate.date = it
-                Log.d(TAG, "DashboardScreen: fetching data after change in date from calendar")
-                fetchMeetingsForTheDate(it.toString())
-                dates = getDates(lastSelectedDate = it)
-            }
+                headerDate = dates.selectedDate.date,
+                updateSelectedDate = {
+                    dates.selectedDate.date = it
+                    Log.d(TAG, "DashboardScreen: fetching data after change in date from calendar")
+                    fetchMeetingsForTheDate(it.toString())
+                    dates = getDates(lastSelectedDate = it)
+                })
+
+            /*
+            Working days in a week with the selected date's Monday being the start date. Weekends not included.
+             */
+
             DatePickerHeader(
                 dates = dates,
                 onDateClickListener = { date ->
@@ -110,26 +165,36 @@ fun DashboardScreen(
                     fetchMeetingsForTheDate(date.date.toString())
                 }
             )
+
+            /*
+            Schedule container
+             */
+
             Row {
+                /*
+                Side bar for time slots
+                 */
                 ScheduleSidebar(
                     hourHeight = 64.dp,
                     modifier = Modifier.padding(end = 24.dp),
                     label = { BasicSidebarLabel(time = it) }
                 )
-                when (dashboardUiState) {
-                    is DashboardUiState.Success -> {
-                        BasicMeetingSchedule(
-                            bookedMeetingRoom = bookedMeetingRoom,
-                            eventContent = {BasicEvent(bookedMeetingRoom = it)},
-                            modifier = Modifier
-                                .weight(1f)
-                                .verticalScroll(rememberScrollState())
-                        )
-                    }
-                    is DashboardUiState.Loading -> {}
-                    is DashboardUiState.None -> {}
+                if (showSchedule) {
+                    Log.d(
+                        TAG,
+                        "DashboardScreen dashboardUiState success:"
+                    )
+                    /*
+                    Showing the booked time slots for each selected day
+                     */
+                    BasicMeetingSchedule(
+                        bookedMeetingRoom = bookedMeetingRoom,
+                        eventContent = { BasicEvent(bookedMeetingRoom = it) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState())
+                    )
                 }
-
             }
         }
     }
@@ -159,6 +224,9 @@ fun CalendarPickerBar(
         )
     }
     if (showDialog) {
+        /*
+        Calendar Picker dialog
+         */
         CustomCalendar(
             onDateSelected = { updateSelectedDate(it) },
             onDismissRequest = { showDialog = false },
@@ -316,6 +384,9 @@ fun BasicMeetingSchedule(
     Layout(
         content =
         {
+            /*
+            Shading booked slots
+             */
             positionedBookings
                 .forEach { bookedMeetingRoom ->
                     Box(modifier = Modifier.eventData(bookedMeetingRoom)) {
@@ -327,6 +398,9 @@ fun BasicMeetingSchedule(
     ) { measurables, constraints ->
         val height = hourHeight.roundToPx() * 24
         val placeablesWithEvents = measurables.map { measurable ->
+            /*
+            Calculating the height (length of eachh booking) and accomodating more than 1 slot in the same time frame (if any)
+             */
             val event = measurable.parentData as BookedMeetingRoom
             val eventDurationMinutes = ChronoUnit.MINUTES.between(
                 LocalTime.of(event.fromTime.toInt(), 0),
@@ -345,6 +419,9 @@ fun BasicMeetingSchedule(
             )
             Pair(placeable, event)
         }
+        /*
+        Placing the booking based on the length of the meeting
+         */
         layout(constraints.minWidth, height) {
             placeablesWithEvents.forEach { (placeable, event) ->
                 val eventOffsetMinutes = ChronoUnit.MINUTES.between(
@@ -425,5 +502,8 @@ private fun List<BookedMeetingRoom>.timesOverlapWith(event: BookedMeetingRoom): 
 @Preview(showBackground = true)
 @Composable
 fun SchedulePreview() {
-    DashboardScreen(bookedMeetingRoom = emptyList())
+    DashboardScreen(
+        workerStatus = WorkInfo.State.ENQUEUED,
+        bookedMeetingRoom = emptyList()
+    )
 }

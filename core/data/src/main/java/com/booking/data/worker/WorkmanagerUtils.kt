@@ -1,6 +1,5 @@
 package com.booking.data.worker
 
-import android.content.Context
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
@@ -12,14 +11,14 @@ import androidx.work.WorkManager
 fun initializeWorker(workManager: WorkManager) {
     workManager
         .enqueueUniqueWork(
-        "SyncWorkName",
-        ExistingWorkPolicy.KEEP,
-        workerRequest(),
-    )
+            "SyncWorkName",
+            ExistingWorkPolicy.KEEP,
+            workerRequest(),
+        )
 
 }
 
-fun workerRequest (): OneTimeWorkRequest {
+fun workerRequest(): OneTimeWorkRequest {
     return OneTimeWorkRequestBuilder<SyncWorker>()
         .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
         .setConstraints(SyncConstraints)
