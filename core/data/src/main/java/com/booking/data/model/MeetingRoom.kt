@@ -8,11 +8,13 @@ import com.booking.network.model.RemoteMeetingRoom
 import com.booking.network.model.RemoteUser
 
 fun RemoteMeetingRoom.asEntity() = MeetingRoomEntity(
+    meetingRoomName = getMeetingRoomName(),
     meetingRoomID = getMeetingRoomID(),
     meetingRoomSize = getMeetingRoomSize(),
     location = getLocation()
 )
 fun MeetingRoomEntity.asDomainModel() = MeetingRoom(
+    meetingRoomName = meetingRoomName,
     meetingRoomID = meetingRoomID,
     meetingRoomSize = meetingRoomSize,
     location = location

@@ -16,4 +16,6 @@ interface LocalDataSourceInterface {
     suspend fun addMeetingRooms(meetingRooms: List<MeetingRoomEntity>)
     suspend fun getUserByEmail(userEmail: String) : UserEntity?
     suspend fun getMeetingRoomByID(meetingRoomID: String) : MeetingRoomEntity?
+    suspend fun getAvailableMeetingRooms(date: String, fromTime: String, toTime: String): List<MeetingRoomEntity?>
+
 }

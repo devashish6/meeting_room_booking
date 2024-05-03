@@ -1,14 +1,13 @@
 package com.booking.data.model
 
 import com.booking.database.model.BookedMeetingRoomEntity
-import com.booking.database.model.MeetingRoomEntity
 import com.booking.model.model.BookedMeetingRoom
 import com.booking.network.model.FirebaseDocument
 import com.booking.network.model.RemoteBookedMeetingRooms
-import com.booking.network.model.RemoteMeetingRoom
+import java.util.UUID
 
 fun RemoteBookedMeetingRooms.asEntity() = BookedMeetingRoomEntity(
-    meetingRoomBookID = getMeetingRoomBookingID(),
+    meetingRoomBookID = UUID.randomUUID().toString(),
     meetingRoomID = getMeetingRoomID(),
     fromTime = getFromTime(),
     toTime = getToTime(),

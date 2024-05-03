@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val startDestination = Routes.Dashboard.route
+            val startDestination = Routes.Booking.route
             NavigationHost(startDestination = startDestination)
 //            SlotsTheme {
 //                RegistrationRoute(onSuccessfulRegistration = {})

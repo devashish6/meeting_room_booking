@@ -14,7 +14,7 @@ import com.booking.database.model.Converters
 
 @Database(
     entities = [MeetingRoomEntity::class, UserEntity::class, BookedMeetingRoomEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class SlotsDataBase : RoomDatabase () {

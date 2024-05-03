@@ -41,6 +41,10 @@ class LocalDataSource @Inject constructor(
         return meetingRoomDao.getMeetingRoomByID(meetingRoomID)
     }
 
+    override suspend fun getAvailableMeetingRooms(date: String, fromTime: String, toTime: String): List<MeetingRoomEntity?> {
+        return meetingRoomDao.getAvailableMeetingRooms(date, fromTime, toTime)
+    }
+
     override suspend fun getBookedMeetingRooms(): List<BookedMeetingRoomEntity?> {
         return bookingMeetingRoomDao.getBookedMeetingRooms()
     }

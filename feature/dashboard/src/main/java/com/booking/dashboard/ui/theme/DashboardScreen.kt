@@ -60,7 +60,7 @@ fun DashboardRoute(
     val bookedMeetingRoom = viewModel.bookedMeetingRooms.collectAsStateWithLifecycle()
     Log.d(TAG, "DashboardScreen: worker status ${workerStatus.value}")
 
-    /*
+    /**
     Fetching Booked time slots when launching dashboard screen
      */
 
@@ -85,7 +85,7 @@ fun DashboardScreen(
     navigateToBooking: () -> Unit = {},
     bookedMeetingRoom: List<BookedMeetingRoom>
 ) {
-    /*
+    /**
     Keeps track of the latest selected date
      */
 
@@ -93,7 +93,7 @@ fun DashboardScreen(
         mutableStateOf(getDates(lastSelectedDate = LocalDate.now()))
     }
 
-    /*
+    /**
     Display the marked slots based on the UI State
      */
 
@@ -105,7 +105,7 @@ fun DashboardScreen(
         fetchMeetingsForTheDate(dates.selectedDate.toString())
     }
 
-    /*
+    /**
     Handling the UI State
      */
     when (dashboardUiState) {
@@ -136,7 +136,7 @@ fun DashboardScreen(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            /*
+            /**
             Calendar Title Bar
              */
             CalendarPickerBar(
@@ -148,7 +148,7 @@ fun DashboardScreen(
                     dates = getDates(lastSelectedDate = it)
                 })
 
-            /*
+            /**
             Working days in a week with the selected date's Monday being the start date. Weekends not included.
              */
 
@@ -166,12 +166,12 @@ fun DashboardScreen(
                 }
             )
 
-            /*
+            /**
             Schedule container
              */
 
             Row {
-                /*
+                /**
                 Side bar for time slots
                  */
                 ScheduleSidebar(
@@ -184,7 +184,7 @@ fun DashboardScreen(
                         TAG,
                         "DashboardScreen dashboardUiState success:"
                     )
-                    /*
+                    /**
                     Showing the booked time slots for each selected day
                      */
                     BasicMeetingSchedule(
@@ -224,7 +224,7 @@ fun CalendarPickerBar(
         )
     }
     if (showDialog) {
-        /*
+        /**
         Calendar Picker dialog
          */
         CustomCalendar(
@@ -384,7 +384,7 @@ fun BasicMeetingSchedule(
     Layout(
         content =
         {
-            /*
+            /**
             Shading booked slots
              */
             positionedBookings
@@ -398,7 +398,7 @@ fun BasicMeetingSchedule(
     ) { measurables, constraints ->
         val height = hourHeight.roundToPx() * 24
         val placeablesWithEvents = measurables.map { measurable ->
-            /*
+            /**
             Calculating the height (length of eachh booking) and accomodating more than 1 slot in the same time frame (if any)
              */
             val event = measurable.parentData as BookedMeetingRoom
@@ -419,7 +419,7 @@ fun BasicMeetingSchedule(
             )
             Pair(placeable, event)
         }
-        /*
+        /**
         Placing the booking based on the length of the meeting
          */
         layout(constraints.minWidth, height) {

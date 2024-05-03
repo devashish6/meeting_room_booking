@@ -5,11 +5,16 @@ import com.google.gson.annotations.SerializedName
 data class RemoteMeetingRoom(
     @SerializedName("meeting_room_id")
     val meetingRoomId: StringValue,
+    @SerializedName("meeting_room_name")
+    val meetingRoomName: StringValue,
     @SerializedName("meeting_room_size")
     val meetingRoomSize: IntegerValue,
     @SerializedName("location")
     val location: StringValue
 ) {
+    fun getMeetingRoomName() : String {
+        return meetingRoomName.stringValue
+    }
     fun getMeetingRoomID() : String {
         return meetingRoomId.stringValue
     }
