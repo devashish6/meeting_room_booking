@@ -1,7 +1,6 @@
 package com.booking.booking
 
 import android.app.TimePickerDialog
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,12 +8,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -24,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,12 +38,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.booking.designsystem.component.ComponentButton
 import com.booking.model.model.MeetingRoom
+import com.booking.model.model.User
 import com.booking.ui.CustomCalendar
 import com.booking.ui.Loading
 import java.time.LocalDate
 import java.util.Calendar
 
-private val TAG = "BOOKING_SCREEN"
+private const val TAG = "BOOKING_SCREEN"
 
 @Composable
 fun BookingsRoute(navigateToConfirmation: () -> Unit) {
@@ -45,11 +52,13 @@ fun BookingsRoute(navigateToConfirmation: () -> Unit) {
     val viewModel: BookingsViewModel = hiltViewModel()
     val bookingUiState = viewModel.bookingUiState.collectAsStateWithLifecycle()
     val meetingRooms = viewModel.meetingRooms.collectAsStateWithLifecycle()
+    val users = viewModel.users.collectAsStateWithLifecycle()
 
     BookingScreen(
         bookingUiState = bookingUiState.value,
         navigateToConfirmation = navigateToConfirmation,
         availableMeetingRooms = meetingRooms.value,
+        availableUsers = users.value,
         bookMeeting = { startTime, endTime, title, meetingRoomID, host, date, attendees ->
             viewModel.bookMeetingRoom(
                 startTime = startTime,
@@ -68,7 +77,9 @@ fun BookingsRoute(navigateToConfirmation: () -> Unit) {
                 endTime = endTime,
                 date = date
             )
-        }
+        },
+        fetchAvailableUsers = { viewModel.getAvailableUsers() },
+        fetchAvailableUsersByEmail = { email -> viewModel.getUsersByEmail(email = email) }
     )
 }
 
@@ -76,7 +87,11 @@ fun BookingsRoute(navigateToConfirmation: () -> Unit) {
 fun BookingScreen(
     bookingUiState: BookingUiState = BookingUiState.None,
     navigateToConfirmation: () -> Unit = {},
+    fetchAvailableMeetings: (String, String, String) -> Unit,
+    fetchAvailableUsers: () -> Unit = {},
     availableMeetingRooms: List<MeetingRoom?>,
+    availableUsers: List<User?>,
+    fetchAvailableUsersByEmail: (String) -> Unit = { _ -> },
     bookMeeting: (
         String,
         String,
@@ -86,19 +101,28 @@ fun BookingScreen(
         String,
         List<String>
     ) -> Unit = { _, _, _, _, _, _, _ -> },
-    fetchAvailableMeetings: (String, String, String) -> Unit
 ) {
-    var title = ""
-    var date = ""
-    var startTime = ""
-    var endTime = ""
-    var selectedRoomID = ""
-    var attendees = emptyList<String>()
-
-    Log.d(TAG, "BookingScreen: recomposing screen $title")
+    var title by remember {
+        mutableStateOf("")
+    }
+    var date by remember {
+        mutableStateOf("")
+    }
+    var startTime by remember {
+        mutableStateOf("")
+    }
+    var endTime by remember {
+        mutableStateOf("")
+    }
+    var selectedRoomID by remember {
+        mutableStateOf("")
+    }
+    var attendees by remember {
+        mutableStateOf(emptyList<String>())
+    }
 
     when (bookingUiState) {
-        is BookingUiState.Success -> navigateToConfirmation.invoke()
+        is BookingUiState.BookingSuccess -> navigateToConfirmation.invoke()
         is BookingUiState.Loading -> Loading()
         is BookingUiState.NoMeetingRoomsAvailable -> {} //Show a toast
     }
@@ -115,23 +139,38 @@ fun BookingScreen(
             style = MaterialTheme.typography.titleMedium
         )
         Row {
-            Log.d(TAG, "BookingScreen: recomposing row $title")
             TitleCompose(setTitle = { title = it })
         }
 
-        SelectDateCompose(setDate = { date = it.toString() })
-
-        SelectTime(setStartTime = { startTime = it }, setEndTime = { endTime = it })
-
-//        SearchUsers()
-
-        MeetingRoomDropDown(
-            promptText = stringResource(R.string.select_a_meeting_room),
-            availableMeetingRooms = availableMeetingRooms.filterNotNull(),
-            setMeetingRoom = { selectedRoomID = it },
-            fetchAvailableMeetings = { fetchAvailableMeetings(startTime, endTime, date) }
+        SelectDateCompose(
+            setDate = { date = it.toString() }
         )
-//        SearchUsers(stringResource(R.string.search_users))
+
+        SelectTime(
+            setStartTime = { startTime = it },
+            setEndTime = { endTime = it }
+        )
+
+        BottomSheet(
+            clickableText = stringResource(R.string.click_here_to_add_users),
+            bottomSheetList = availableUsers.filter {
+                it?.email?.isNotEmpty() == true
+            },
+            fetchData = { fetchAvailableUsers() },
+            saveData = {
+                attendees = it
+            },
+            showSearchBar = true,
+            searchBarFunction = fetchAvailableUsersByEmail
+        )
+
+        BottomSheet(
+            clickableText = stringResource(R.string.click_here_to_see_available_meeting_rooms),
+            bottomSheetList = availableMeetingRooms,
+            fetchData = { fetchAvailableMeetings(startTime, endTime, date) },
+            saveData = { selectedRoomID = it.first() }
+        )
+
         ComponentButton(
             onClick = {
                 bookMeeting.invoke(
@@ -141,7 +180,9 @@ fun BookingScreen(
                     selectedRoomID,
                     "host",
                     date,
-                    attendees
+                    attendees.filter {
+                        it.isNotEmpty()
+                    }
                 )
             },
             text = stringResource(R.string.book_meeting),
@@ -149,6 +190,135 @@ fun BookingScreen(
         )
 
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BottomSheet(
+    clickableText: String,
+    bottomSheetList: List<*>,
+    showSearchBar: Boolean = false,
+    fetchData: () -> Unit,
+    saveData: (List<String>) -> Unit = {},
+    searchBarFunction: (String) -> Unit = { _ -> }
+) {
+    val selectedUsers = mutableListOf("")
+    var showSaveButton by remember {
+        mutableStateOf(false)
+    }
+    var headerText by remember {
+        mutableStateOf(clickableText)
+    }
+    var showBottomSheet by remember {
+        mutableStateOf(false)
+    }
+    Text(
+        text = headerText,
+        modifier = Modifier
+            .padding(top = 24.dp)
+            .clickable {
+                fetchData.invoke()
+                showBottomSheet = true
+            },
+        style = MaterialTheme.typography.labelLarge,
+        color = Color.Blue
+    )
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showBottomSheet = false },
+        ) {
+            if (showSearchBar) {
+                CustomSearchBar(
+                    onSearch = { searchBarFunction(it) }
+                )
+            }
+            LazyColumn {
+                items(bottomSheetList) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 10.dp, horizontal = 20.dp)
+                    ) {
+                        when (it) {
+                            is MeetingRoom -> {
+                                Text(
+                                    text = it.meetingRoomName,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    modifier = Modifier.clickable {
+                                        saveData(listOf(it.meetingRoomID))
+                                        headerText = it.meetingRoomName
+                                        showBottomSheet = false
+                                    }
+                                )
+                            }
+
+                            is User -> {
+                                CustomCheckBox(
+                                    user = it,
+                                    addUser = { selectedUsers.add(it) },
+                                    removeUser = {
+                                        if (selectedUsers.contains(it)) {
+                                            selectedUsers.remove(it)
+                                        }
+                                    }
+                                )
+                                Text(
+                                    text = it.email,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    modifier = Modifier
+                                        .padding(vertical = 12.dp)
+                                )
+                                showSaveButton = true
+                            }
+
+                        }
+                    }
+                }
+
+            }
+            if (showSaveButton) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Button(
+                        onClick =
+                        {
+                            saveData(selectedUsers as List<String>)
+                            showBottomSheet = false
+                        },
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    ) {
+                        Text(text = "Invite Users")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CustomCheckBox(
+    user: User,
+    addUser: (String) -> Unit,
+    removeUser: (String) -> Unit
+) {
+    var isSelected by remember {
+        mutableStateOf(user.isSelected)
+    }
+    Checkbox(
+        checked = isSelected,
+        onCheckedChange = {
+            isSelected = it
+            user.isSelected = isSelected
+            if (isSelected) {
+                addUser(user.email)
+            } else {
+                removeUser(user.email)
+            }
+        }
+    )
 }
 
 @Composable
@@ -247,7 +417,6 @@ fun TitleCompose(
     var placeHolder by remember {
         mutableStateOf("")
     }
-    Log.d(TAG, "TitleCompose: recomposing $placeHolder")
     TextField(
         value = placeHolder,
         onValueChange =
@@ -256,71 +425,6 @@ fun TitleCompose(
             setTitle.invoke(placeHolder)
         }
     )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MeetingRoomDropDown(
-    promptText: String,
-    availableMeetingRooms: List<MeetingRoom>,
-    setMeetingRoom: (String) -> Unit,
-    fetchAvailableMeetings: () -> Unit,
-) {
-    var selectedRoom by remember {
-        mutableStateOf("")
-    }
-    var expandDropDown by remember {
-        mutableStateOf(false)
-    }
-    ExposedDropdownMenuBox(
-        expanded = expandDropDown,
-        onExpandedChange = {
-            fetchAvailableMeetings.invoke()
-            expandDropDown = !expandDropDown
-        },
-        modifier = Modifier.padding(top = 20.dp, bottom = 20.dp)
-    ) {
-        TextField(
-            value = selectedRoom,
-            onValueChange = {},
-            readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandDropDown) },
-            modifier = Modifier.menuAnchor(),
-            label = { Text(text = promptText) }
-        )
-        ExposedDropdownMenu(
-            expanded = expandDropDown,
-            onDismissRequest = { expandDropDown = false }
-        ) {
-            if (availableMeetingRooms.isEmpty()) {
-                Text(text = "No available meeting rooms")
-            } else {
-                availableMeetingRooms.forEachIndexed { index, meetingRoom ->
-                    DropdownMenuItem(
-                        text = { Text(text = meetingRoom.meetingRoomName) },
-                        onClick = {
-                            selectedRoom = availableMeetingRooms[index].meetingRoomName
-                            setMeetingRoom(selectedRoom)
-                            expandDropDown = false
-                        },
-                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
-                    )
-
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SearchUsers() {
-    var promptText by remember {
-        mutableStateOf("")
-    }
-    Text(text = "Enter first 3 character of the attendee's email-id")
-
-
 }
 
 @Composable
@@ -338,12 +442,57 @@ private fun ClickableText(
         )
         Text(
             text = clickableText,
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .clickable { onClick.invoke() }
         )
+    }
+}
+
+@Composable
+fun CustomSearchBar(onSearch: (String) -> Unit) {
+    var searchText by remember { mutableStateOf("") }
+    var isHintDisplayed by remember {
+        mutableStateOf(true)
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White,
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp, top = 12.dp, bottom = 12.dp, end = 8.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, top = 18.dp, bottom = 18.dp, end = 16.dp)
+            ) {
+                BasicTextField(
+                    value = searchText,
+                    onValueChange = {
+                        searchText = it
+                        isHintDisplayed = searchText.isEmpty()
+                        onSearch(it)
+                    },
+                    maxLines = 1,
+                    singleLine = true,
+                    textStyle = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+                if (isHintDisplayed) {
+                    Text(text = "Enter User's email")
+                }
+            }
+        }
+
     }
 }
 
@@ -353,6 +502,14 @@ private fun ClickableText(
 fun Preview() {
     BookingScreen(
         availableMeetingRooms = emptyList(),
-        fetchAvailableMeetings = { _, _, _ -> }
+        fetchAvailableMeetings = { _, _, _ -> },
+        availableUsers = listOf(
+            User("hkecb@gma.com", "cec", "cece"),
+            User("decece@gmcecea.com", "cewcw", "cqcw"),
+            User("hkcececb@gma.com", "ceevewvc", "cecvqeve"),
+            User("wvcc@gma.com", "cveqwrcec", "wqc"),
+            User("wecw@gma.com", "cjwc", "cece"),
+            User("kncewj@gma.com", "cekjcwejkcc", "cece")
+        )
     )
 }

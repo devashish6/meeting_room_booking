@@ -14,6 +14,7 @@ import com.booking.model.model.MeetingRoom
 import com.booking.model.model.User
 import com.booking.network.retrofit.RemoteDataSource
 import com.booking.network.utils.convertToCustomFormat
+import com.booking.network.utils.convertToFormat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -105,10 +106,17 @@ class DataRepository @Inject constructor(
             Log.d(TAG, "syncWith: adding users to database : ${remoteUsers.asListOfUserEntity()}")
             _users.emit(remoteUsers.asListOfUserEntity().map { it.asDomainModel() })
             localDataSourceInterface.addMeetingRooms(remoteMeetingRooms.asListOfMeetingRoomEntity())
-            Log.d(TAG, "syncWith: adding meeting room data to database : ${remoteMeetingRooms.asListOfMeetingRoomEntity()}")
-            _meetingRooms.emit(remoteMeetingRooms.asListOfMeetingRoomEntity().map { it.asDomainModel() })
+            Log.d(
+                TAG,
+                "syncWith: adding meeting room data to database : ${remoteMeetingRooms.asListOfMeetingRoomEntity()}"
+            )
+            _meetingRooms.emit(
+                remoteMeetingRooms.asListOfMeetingRoomEntity().map { it.asDomainModel() })
             localDataSourceInterface.addBookedMeetingRooms(remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity())
-            Log.d(TAG, "syncWith: adding booked meetings : ${remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity()}")
+            Log.d(
+                TAG,
+                "syncWith: adding booked meetings : ${remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity()}"
+            )
             _bookedMeetingRooms.emit(
                 remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity()
                     .map { it.asDomainModel() })
@@ -147,6 +155,36 @@ class DataRepository @Inject constructor(
         }
     }
 
+    suspend fun bookMeetingRoom(
+        startTime: String,
+        endTime: String,
+        title: String,
+        meetingRoomId: String,
+        host: String,
+        date: String,
+        attendees: List<String>
+    ) : Boolean {
+
+        val bookingHashMap = HashMap<String, Any>()
+        bookingHashMap["from_time"] = startTime
+        bookingHashMap["to_time"] = endTime
+        bookingHashMap["meeting_room_id"] = meetingRoomId
+        bookingHashMap["host"] = host
+        bookingHashMap["date"] = date
+        bookingHashMap["meeting_title"] = title
+        bookingHashMap["attendees"] = attendees
+
+        return try {
+            val requestJson = convertToFormat(bookingHashMap)
+            Log.d(TAG, "bookMeetingRoom: $requestJson")
+            remoteDataSource.bookMeetingRoom(requestJson)
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "bookMeetingRoom: ${e.stackTrace}")
+            false
+        }
+    }
+
     suspend fun markTimeSlots(date: String) {
         val bookings = localDataSourceInterface.getBookingsForDate(date)
         if (bookings.isNotEmpty()) {
@@ -155,6 +193,28 @@ class DataRepository @Inject constructor(
             Log.d(TAG, "markTimeSlots: ${_bookedMeetingRooms.value}")
         } else {
             _bookedMeetingRooms.emit(emptyList())
+        }
+    }
+
+    suspend fun getAvailableMeetingRooms(date: String, fromTime: String, toTime: String) {
+        val availableRooms = localDataSourceInterface.getAvailableMeetingRooms(date, fromTime, toTime)
+        if (availableRooms.isNotEmpty()) {
+            _offlineMeetingRooms.emit(availableRooms)
+            _meetingRooms.emit(availableRooms.map { it?.asDomainModel() })
+            Log.d(TAG, "getAvailableMeetingRooms: ${_meetingRooms.value}")
+        } else {
+            Log.d(TAG, "getAvailableMeetingRooms: empty")
+            _meetingRooms.emit(emptyList())
+        }
+    }
+
+    suspend fun searchForUsers(email: String) {
+        val result = localDataSourceInterface.searchUsers(email)
+        if (result.isNotEmpty()) {
+            _offlineUsers.emit(result)
+            _users.emit(result.map { it?.asDomainModel() })
+        } else {
+            _users.emit(emptyList())
         }
     }
 }

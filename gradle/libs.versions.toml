@@ -25,6 +25,7 @@ hiltWork = "1.2.0"
 firebaseFirestoreKtx = "24.11.1"
 hilt-navgation-compose = "1.1.0"
 lifecycleRuntimeCompose = "2.7.0"
+datastorePreferencesCoreJvm = "1.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -62,6 +63,7 @@ androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref 
 androidx-hilt-navigation = {group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navgation-compose"}
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
+androidx-datastore-preferences-core-jvm = { group = "androidx.datastore", name = "datastore-preferences-core-jvm", version.ref = "datastorePreferencesCoreJvm" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -29,6 +29,10 @@ class LocalDataSource @Inject constructor(
         return usersDao.getUserByEmail(userEmail)
     }
 
+    override suspend fun searchUsers(userEmail: String): List<UserEntity?> {
+        return usersDao.searchUsers(userEmail)
+    }
+
     override suspend fun getAllMeetingRooms(): List<MeetingRoomEntity?> {
         return meetingRoomDao.getAllMeetingRooms()
     }

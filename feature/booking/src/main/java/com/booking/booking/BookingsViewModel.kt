@@ -1,16 +1,17 @@
 package com.booking.booking
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.booking.data.repository.DataRepository
 import com.booking.model.model.BookedMeetingRoom
 import com.booking.model.model.MeetingRoom
+import com.booking.model.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,6 +32,9 @@ class BookingsViewModel @Inject constructor(
 
     val bookedMeetingRooms: StateFlow<List<BookedMeetingRoom?>>
         get() = dataRepository.bookedMeetingRooms
+
+    val users : StateFlow<List<User?>>
+        get() = dataRepository.users
 
     fun bookMeetingRoom(
         startTime: String,
@@ -58,6 +62,8 @@ class BookingsViewModel @Inject constructor(
             return
         }
         viewModelScope.launch {
+            Log.d(TAG, "bookMeetingRoom: $attendees")
+            Log.d(TAG, "bookMeetingRoom: $meetingRoomId")
             val bookingStatus = dataRepository.bookMeetingRoom(
                 startTime = startTime,
                 endTime = endTime,
@@ -68,7 +74,7 @@ class BookingsViewModel @Inject constructor(
                 attendees = attendees
             )
             if (bookingStatus) {
-                _bookingsUiState.value = BookingUiState.Success
+                _bookingsUiState.value = BookingUiState.BookingSuccess
             } else {
                 _bookingsUiState.value = BookingUiState.None
             }
@@ -88,6 +94,18 @@ class BookingsViewModel @Inject constructor(
             dataRepository.getAvailableMeetingRooms(date = date, fromTime = startTime, toTime = endTime)
         }
 
+    }
+
+    fun getAvailableUsers() {
+        viewModelScope.launch {
+            dataRepository.getAllUsers()
+        }
+    }
+
+    fun getUsersByEmail(email: String) {
+        viewModelScope.launch {
+            dataRepository.searchForUsers(email)
+        }
     }
 
 }

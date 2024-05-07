@@ -8,9 +8,9 @@ import com.booking.database.model.BookedMeetingRoomEntity
 
 @Dao
 interface BookedMeetingRoomDao {
-    @Query("SELECT * from meeting_room_booking")
+    @Query("SELECT * from meeting_room_booking ORDER BY date ASC, from_time ASC")
     suspend fun getBookedMeetingRooms() : List<BookedMeetingRoomEntity?>
-    @Query("SELECT * from meeting_room_booking WHERE date = :date")
+    @Query("SELECT * from meeting_room_booking WHERE date = :date ORDER BY from_time ASC")
     suspend fun getBookingsForDate(date: String) : List<BookedMeetingRoomEntity?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
