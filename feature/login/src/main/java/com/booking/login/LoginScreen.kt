@@ -27,7 +27,8 @@ const val TAG = "LOGIN_SCREEN_DEBUG"
 @Composable
 fun LoginRoute(
     loginViewModel : LoginViewModel = hiltViewModel(),
-    onSuccessfulLogin : () -> Unit
+    onSuccessfulLogin : () -> Unit,
+    onBackClicked : () -> Unit
 ) {
     val loginUiState = loginViewModel.loginUiState.collectAsStateWithLifecycle()
     LoginScreen(

@@ -1,27 +1,44 @@
 package com.booking.booking
 
 import android.app.TimePickerDialog
-import androidx.compose.foundation.background
+import android.content.res.Configuration
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,13 +47,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.booking.designsystem.component.ComponentButton
 import com.booking.model.model.MeetingRoom
 import com.booking.model.model.User
 import com.booking.ui.CustomCalendar
@@ -47,7 +65,10 @@ import java.util.Calendar
 private const val TAG = "BOOKING_SCREEN"
 
 @Composable
-fun BookingsRoute(navigateToConfirmation: () -> Unit) {
+fun BookingsRoute(
+    navigateToConfirmation: () -> Unit,
+    onBackClicked: () -> Unit
+) {
 
     val viewModel: BookingsViewModel = hiltViewModel()
     val bookingUiState = viewModel.bookingUiState.collectAsStateWithLifecycle()
@@ -79,19 +100,22 @@ fun BookingsRoute(navigateToConfirmation: () -> Unit) {
             )
         },
         fetchAvailableUsers = { viewModel.getAvailableUsers() },
-        fetchAvailableUsersByEmail = { email -> viewModel.getUsersByEmail(email = email) }
+        fetchAvailableUsersByEmail = { email -> viewModel.getUsersByEmail(email = email) },
+        onBackClicked = onBackClicked
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookingScreen(
     bookingUiState: BookingUiState = BookingUiState.None,
     navigateToConfirmation: () -> Unit = {},
-    fetchAvailableMeetings: (String, String, String) -> Unit,
+    fetchAvailableMeetings: (String, String, String) -> Unit = { _, _, _ -> },
     fetchAvailableUsers: () -> Unit = {},
-    availableMeetingRooms: List<MeetingRoom?>,
-    availableUsers: List<User?>,
+    availableMeetingRooms: List<MeetingRoom?> = emptyList(),
+    availableUsers: List<User?> = emptyList(),
     fetchAvailableUsersByEmail: (String) -> Unit = { _ -> },
+    onBackClicked: () -> Unit = {},
     bookMeeting: (
         String,
         String,
@@ -127,67 +151,102 @@ fun BookingScreen(
         is BookingUiState.NoMeetingRoomsAvailable -> {} //Show a toast
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.onTertiary),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = stringResource(id = R.string.meeting_title),
-            style = MaterialTheme.typography.titleMedium
-        )
-        Row {
-            TitleCompose(setTitle = { title = it })
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Meeting Details",
+                        modifier = Modifier.padding(16.dp),
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                },
+                navigationIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close",
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            )
         }
+    ) { paddingValues ->
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .padding(paddingValues)
+        ) {
 
-        SelectDateCompose(
-            setDate = { date = it.toString() }
-        )
+            TitleCompose(setTitle = { title = it })
 
-        SelectTime(
-            setStartTime = { startTime = it },
-            setEndTime = { endTime = it }
-        )
+            SelectDateCompose(
+                setDate = { date = it.toString() }
+            )
 
-        BottomSheet(
-            clickableText = stringResource(R.string.click_here_to_add_users),
-            bottomSheetList = availableUsers.filter {
-                it?.email?.isNotEmpty() == true
-            },
-            fetchData = { fetchAvailableUsers() },
-            saveData = {
-                attendees = it
-            },
-            showSearchBar = true,
-            searchBarFunction = fetchAvailableUsersByEmail
-        )
+            Spacer(modifier = Modifier.padding(4.dp))
 
-        BottomSheet(
-            clickableText = stringResource(R.string.click_here_to_see_available_meeting_rooms),
-            bottomSheetList = availableMeetingRooms,
-            fetchData = { fetchAvailableMeetings(startTime, endTime, date) },
-            saveData = { selectedRoomID = it.first() }
-        )
+            SelectTime(
+                setStartTime = { startTime = it },
+                setEndTime = { endTime = it }
+            )
 
-        ComponentButton(
-            onClick = {
-                bookMeeting.invoke(
-                    startTime,
-                    endTime,
-                    title,
-                    selectedRoomID,
-                    "host",
-                    date,
-                    attendees.filter {
-                        it.isNotEmpty()
-                    }
+            Spacer(modifier = Modifier.padding(4.dp))
+
+            BottomSheet(
+                clickableText = stringResource(R.string.click_here_to_add_users),
+                bottomSheetList = availableUsers.filter {
+                    it?.email?.isNotEmpty() == true
+                },
+                fetchData = { fetchAvailableUsers() },
+                saveData = {
+                    attendees = it
+                },
+                showSearchBar = true,
+                searchBarFunction = fetchAvailableUsersByEmail,
+                trailingIcon = Icons.Default.AddCircle
+            )
+
+            Spacer(modifier = Modifier.padding(4.dp))
+
+            BottomSheet(
+                clickableText = stringResource(R.string.click_here_to_see_available_meeting_rooms),
+                bottomSheetList = availableMeetingRooms,
+                fetchData = { fetchAvailableMeetings(startTime, endTime, date) },
+                saveData = { selectedRoomID = it.first() },
+                trailingIcon = Icons.Default.ArrowDropDown
+            )
+
+            Button(
+                onClick = {
+                    bookMeeting.invoke(
+                        startTime,
+                        endTime,
+                        title,
+                        selectedRoomID,
+                        "host",
+                        date,
+                        attendees.filter {
+                            it.isNotEmpty()
+                        }
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = ButtonColors(containerColor = Color.Black,
+                    contentColor = Color.White,
+                    disabledContainerColor = Color.Cyan,
+                    disabledContentColor = Color.Cyan
                 )
-            },
-            text = stringResource(R.string.book_meeting),
-            modifier = Modifier.padding(top = 20.dp)
-        )
+            ) {
+                Text(
+                    text = "Book",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+
+            }
+        }
 
     }
 }
@@ -200,7 +259,8 @@ private fun BottomSheet(
     showSearchBar: Boolean = false,
     fetchData: () -> Unit,
     saveData: (List<String>) -> Unit = {},
-    searchBarFunction: (String) -> Unit = { _ -> }
+    searchBarFunction: (String) -> Unit = { _ -> },
+    trailingIcon: ImageVector
 ) {
     val selectedUsers = mutableListOf("")
     var showSaveButton by remember {
@@ -212,16 +272,32 @@ private fun BottomSheet(
     var showBottomSheet by remember {
         mutableStateOf(false)
     }
-    Text(
-        text = headerText,
+//    Card(
+//        modifier = Modifier
+//            .padding(top = 16.dp)
+//            .fillMaxWidth()
+//    ) {
+    OutlinedTextField(
+        label = {
+            Text(
+                text = headerText,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        },
+        value = headerText,
+        onValueChange = {},
+        trailingIcon = {
+            Image(
+                imageVector = trailingIcon,
+                contentDescription = "add",
+                Modifier.clickable {
+                    fetchData.invoke()
+                    showBottomSheet = true
+                })
+        },
         modifier = Modifier
-            .padding(top = 24.dp)
-            .clickable {
-                fetchData.invoke()
-                showBottomSheet = true
-            },
-        style = MaterialTheme.typography.labelLarge,
-        color = Color.Blue
+            .fillMaxWidth()
+            .padding(16.dp)
     )
     if (showBottomSheet) {
         ModalBottomSheet(
@@ -296,6 +372,7 @@ private fun BottomSheet(
             }
         }
     }
+//    }
 }
 
 @Composable
@@ -362,26 +439,83 @@ fun SelectTime(
         timePickerDialog.show()
     }
 
-    ClickableText(
-        titleText = stringResource(R.string.from_time),
-        onClick = {
-            showTimePickerDialog("startTime")
-            startHeader = startTime
-        },
-        modifier = Modifier.padding(top = 20.dp),
-        clickableText = startHeader
-    )
-    ClickableText(
-        titleText = stringResource(R.string.to_time),
-        onClick = {
-            showTimePickerDialog("endTime")
-            endHeader = endTime
-        },
-        modifier = Modifier.padding(top = 20.dp),
-        clickableText = endHeader
-    )
-}
+    Row(
+        horizontalArrangement = Arrangement.SpaceAround,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        OutlinedTextField(
+            label = {
+                Text(
+                    text = stringResource(id = R.string.from_time),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            },
+            value = startHeader,
+            onValueChange = {},
+            trailingIcon = {
+                Image(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = "add",
+                    Modifier.clickable {
+                        showTimePickerDialog("startTime")
+                        startHeader = startTime
+                    })
+            },
+            modifier = Modifier.width(160.dp)
+        )
+        OutlinedTextField(
+            label = {
+                Text(
+                    text = stringResource(id = R.string.to_time),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            },
+            value = endHeader,
+            onValueChange = {},
+            trailingIcon = {
+                Image(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = "add",
+                    Modifier.clickable {
+                        showTimePickerDialog("endTime")
+                        endHeader = endTime
+                    })
+            },
+            modifier = Modifier.width(160.dp)
+        )
+    }
 
+//    Card(
+//        modifier = Modifier
+//            .padding(start = 8.dp, top = 16.dp, end = 8.dp)
+//            .fillMaxWidth()
+//    ) {
+//        ClickableText(
+//            titleText = stringResource(R.string.from_time),
+//            onClick = {
+//                showTimePickerDialog("startTime")
+//                startHeader = startTime
+//            },
+//            clickableText = startHeader,
+//            modifier = Modifier.padding(top = 10.dp, start = 8.dp, bottom = 10.dp)
+//        )
+//    }
+//    Card(
+//        modifier = Modifier
+//            .padding(start = 8.dp, top = 16.dp, end = 8.dp)
+//            .fillMaxWidth(),
+//    ) {
+//        ClickableText(
+//            titleText = stringResource(R.string.to_time),
+//            onClick = {
+//                showTimePickerDialog("endTime")
+//                endHeader = endTime
+//            },
+//            clickableText = endHeader,
+//            modifier = Modifier.padding(top = 10.dp, start = 8.dp, bottom = 10.dp)
+//        )
+//    }
+}
 
 @Composable
 fun SelectDateCompose(setDate: (LocalDate) -> Unit) {
@@ -391,12 +525,24 @@ fun SelectDateCompose(setDate: (LocalDate) -> Unit) {
     var showCalendar by remember {
         mutableStateOf(false)
     }
-    ClickableText(
-        titleText = stringResource(R.string.date),
-        clickableText = selectedDate.toString(),
-        onClick = { showCalendar = true },
-        modifier = Modifier.padding(top = 20.dp)
+
+    OutlinedTextField(
+        label = {
+            Text(text = "Select Date")
+        },
+        value = selectedDate.toString(),
+        onValueChange = {},
+        trailingIcon = {
+            Image(
+                imageVector = Icons.Default.DateRange,
+                contentDescription = "Date picker",
+                Modifier.clickable { showCalendar = true })
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
     )
+
     if (showCalendar) {
         CustomCalendar(
             onDateSelected =
@@ -417,13 +563,28 @@ fun TitleCompose(
     var placeHolder by remember {
         mutableStateOf("")
     }
-    TextField(
+
+    OutlinedTextField(
         value = placeHolder,
-        onValueChange =
-        {
+        onValueChange = {
             placeHolder = it
-            setTitle.invoke(placeHolder)
-        }
+            setTitle(placeHolder)
+        },
+        label = {
+            Text(
+                text = stringResource(id = R.string.meeting_title),
+                style = MaterialTheme.typography.bodyLarge
+            )
+        },
+        trailingIcon = {
+            Image(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+        },
+        placeholder = {
+            Text(text = "Enter meeting title")
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
     )
 }
 
@@ -434,18 +595,24 @@ private fun ClickableText(
     modifier: Modifier = Modifier,
     clickableText: String = stringResource(id = R.string.select_time)
 ) {
-    Row(modifier = modifier) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = modifier
+    ) {
         Text(
             text = titleText,
             style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.align(Alignment.CenterVertically)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp)
+                .weight(1f)
         )
         Text(
             text = clickableText,
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier
-                .align(Alignment.CenterVertically)
+                .padding(horizontal = 12.dp)
                 .clickable { onClick.invoke() }
         )
     }
@@ -498,18 +665,8 @@ fun CustomSearchBar(onSearch: (String) -> Unit) {
 
 
 @Preview(showBackground = true)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun Preview() {
-    BookingScreen(
-        availableMeetingRooms = emptyList(),
-        fetchAvailableMeetings = { _, _, _ -> },
-        availableUsers = listOf(
-            User("hkecb@gma.com", "cec", "cece"),
-            User("decece@gmcecea.com", "cewcw", "cqcw"),
-            User("hkcececb@gma.com", "ceevewvc", "cecvqeve"),
-            User("wvcc@gma.com", "cveqwrcec", "wqc"),
-            User("wecw@gma.com", "cjwc", "cece"),
-            User("kncewj@gma.com", "cekjcwejkcc", "cece")
-        )
-    )
+    BookingScreen()
 }

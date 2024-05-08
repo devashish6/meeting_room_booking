@@ -18,14 +18,16 @@ fun NavigationHost(
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Routes.Login.route) {
-            LoginRoute {
-                navController.navigate(Routes.Dashboard.route)
-            }
+            LoginRoute(
+                onSuccessfulLogin = { navController.navigate(Routes.Dashboard.route) },
+                onBackClicked = { navController.navigateUp() }
+            )
         }
         composable(Routes.Register.route) {
-            RegistrationRoute {
-                navController.navigate(Routes.Home.route)
-            }
+            RegistrationRoute (
+                onSuccessfulRegistration = { navController.navigate(Routes.Home.route) },
+                onBackClicked = { navController.navigateUp() }
+            )
         }
         composable(Routes.Home.route) {
             HomeScreen(
@@ -37,7 +39,10 @@ fun NavigationHost(
             DashboardRoute(navigateToBooking = {navController.navigate(Routes.Booking.route)})
         }
         composable(Routes.Booking.route) {
-            BookingsRoute { navController.navigate(Routes.Confirm.route) }
+            BookingsRoute(
+                navigateToConfirmation = { navController.navigate(Routes.Confirm.route)},
+                onBackClicked = { navController.navigateUp() }
+            )
         }
         composable(Routes.Confirm.route) {
             ConfirmationScreen()

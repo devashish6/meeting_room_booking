@@ -27,7 +27,8 @@ private val TAG = "REGISTRATION_SCREEN_DEBUG"
 @Composable
 fun RegistrationRoute (
     registrationViewModel: RegistrationViewModel = hiltViewModel(),
-    onSuccessfulRegistration : () -> Unit
+    onSuccessfulRegistration : () -> Unit,
+    onBackClicked : () -> Unit
 ) {
     val registrationUiState = registrationViewModel.registrationUiState.collectAsStateWithLifecycle()
     RegistrationScreen(
