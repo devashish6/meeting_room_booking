@@ -43,7 +43,6 @@ fun NavigationHost(
         }
         composable(Routes.Booking.route) {
             BookingsRoute(
-                navController = navController,
                 navigateToDashboard = { navController.navigate(Routes.Dashboard.route)},
                 onBackClicked = { navController.navigateUp() },
                 userName = userName

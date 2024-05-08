@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.booking.data.repository.DataRepository
+import com.booking.data.worker.initializeWorker
 import com.booking.model.model.BookedMeetingRoom
 import com.booking.model.model.MeetingRoom
 import com.booking.model.model.User
@@ -45,6 +46,7 @@ class BookingsViewModel @Inject constructor(
         date: String,
         attendees: List<String>
     ) {
+        initializeWorker(workManager)
         _bookingsUiState.value = BookingUiState.Loading
         if (basicValidation(startTime, endTime, date)|| title.isEmpty() || meetingRoomId.isEmpty() || host.isEmpty() || attendees.isEmpty()) {
             _bookingsUiState.value = BookingUiState.InvalidDetails
@@ -86,6 +88,7 @@ class BookingsViewModel @Inject constructor(
     }
 
     fun getAvailableMeetingRooms(startTime: String, endTime: String, date: String) {
+        initializeWorker(workManager)
         if (basicValidation(startTime, endTime, date)) {
             _bookingsUiState.value = BookingUiState.InvalidDetails
             return
@@ -97,12 +100,14 @@ class BookingsViewModel @Inject constructor(
     }
 
     fun getAvailableUsers() {
+        initializeWorker(workManager)
         viewModelScope.launch {
             dataRepository.getAllUsers()
         }
     }
 
     fun getUsersByEmail(email: String) {
+        initializeWorker(workManager)
         viewModelScope.launch {
             dataRepository.searchForUsers(email)
         }

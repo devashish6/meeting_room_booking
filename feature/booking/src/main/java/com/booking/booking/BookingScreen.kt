@@ -66,7 +66,6 @@ private const val TAG = "BOOKING_SCREEN"
 
 @Composable
 fun BookingsRoute(
-    navController: NavController,
     navigateToDashboard: () -> Unit,
     onBackClicked: () -> Unit,
     userName: String = ""
@@ -148,22 +147,26 @@ fun BookingScreen(
     var attendees by remember {
         mutableStateOf(emptyList<String>())
     }
-    var showDialog by remember {
-        mutableStateOf(false)
-    }
 
     when (bookingUiState) {
         is BookingUiState.BookingSuccess -> {
             BookingConfirmed(
                 onConfirmation = { navigateToDashboard.invoke() },
-                dialogTitle = "Booking Confirmed",
-                dialogText = "Booking confirmation",
+                dialogTitle = stringResource(R.string.booking_confirmed),
+                dialogText = String.format(
+                    stringResource(R.string.meeting_room_booked_for_s_at_s_invitees_are_s),
+                    date,
+                    "$startTime to $endTime",
+                    attendees.toString()
+                )
             )
         }
 
         is BookingUiState.Loading -> Loading()
         is BookingUiState.NoMeetingRoomsAvailable -> {
-            Toast.makeText(LocalContext.current, "No Meeting Rooms Available", Toast.LENGTH_SHORT).show()
+            Toast.makeText(LocalContext.current,
+                stringResource(R.string.no_meeting_rooms_available), Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -172,7 +175,7 @@ fun BookingScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Meeting Details",
+                        text = stringResource(R.string.meeting_details),
                         modifier = Modifier.padding(16.dp),
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.headlineSmall
@@ -260,7 +263,7 @@ fun BookingScreen(
                 )
             ) {
                 Text(
-                    text = "Book",
+                    text = stringResource(R.string.book),
                     style = MaterialTheme.typography.bodyLarge
                 )
 
@@ -386,7 +389,7 @@ private fun BottomSheet(
                         },
                         modifier = Modifier.padding(bottom = 8.dp)
                     ) {
-                        Text(text = "Invite Users")
+                        Text(text = stringResource(R.string.invite_users))
                     }
                 }
             }
@@ -516,7 +519,7 @@ fun SelectDateCompose(setDate: (LocalDate) -> Unit) {
 
     OutlinedTextField(
         label = {
-            Text(text = "Select Date")
+            Text(text = stringResource(R.string.select_date))
         },
         value = selectedDate.toString(),
         onValueChange = {},
@@ -613,7 +616,7 @@ fun CustomSearchBar(onSearch: (String) -> Unit) {
                         .fillMaxWidth()
                 )
                 if (isHintDisplayed) {
-                    Text(text = "Enter User's email")
+                    Text(text = stringResource(R.string.enter_user_s_email))
                 }
             }
         }

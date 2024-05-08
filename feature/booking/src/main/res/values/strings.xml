@@ -9,4 +9,12 @@
     <string name="select_a_meeting_room">Select a Meeting room</string>
     <string name="click_here_to_see_available_meeting_rooms">Select Meeting Room</string>
     <string name="click_here_to_add_users">Add users</string>
+    <string name="booking_confirmed">Booking Confirmed</string>
+    <string name="meeting_room_booked_for_s_at_s_invitees_are_s">Meeting room booked for %1s at %2s.\n Invitees are %3s</string>
+    <string name="no_meeting_rooms_available">No Meeting Rooms Available</string>
+    <string name="meeting_details">Meeting Details</string>
+    <string name="book">Book</string>
+    <string name="invite_users">Invite Users</string>
+    <string name="select_date">Select Date</string>
+    <string name="enter_user_s_email">Enter User\'s email</string>
 </resources>
