@@ -1,6 +1,7 @@
 package com.booking.booking
 
 import android.app.TimePickerDialog
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,9 +18,11 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
@@ -32,6 +35,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,6 +53,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.booking.model.model.MeetingRoom
 import com.booking.model.model.User
 import com.booking.ui.CustomCalendar
@@ -60,8 +66,10 @@ private const val TAG = "BOOKING_SCREEN"
 
 @Composable
 fun BookingsRoute(
-    navigateToConfirmation: () -> Unit,
-    onBackClicked: () -> Unit
+    navController: NavController,
+    navigateToDashboard: () -> Unit,
+    onBackClicked: () -> Unit,
+    userName: String = ""
 ) {
 
     val viewModel: BookingsViewModel = hiltViewModel()
@@ -70,8 +78,9 @@ fun BookingsRoute(
     val users = viewModel.users.collectAsStateWithLifecycle()
 
     BookingScreen(
+        host = userName,
         bookingUiState = bookingUiState.value,
-        navigateToConfirmation = navigateToConfirmation,
+        navigateToDashboard = navigateToDashboard,
         availableMeetingRooms = meetingRooms.value,
         availableUsers = users.value,
         bookMeeting = { startTime, endTime, title, meetingRoomID, host, date, attendees ->
@@ -102,8 +111,9 @@ fun BookingsRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookingScreen(
+    host: String = "",
     bookingUiState: BookingUiState = BookingUiState.None,
-    navigateToConfirmation: () -> Unit = {},
+    navigateToDashboard: () -> Unit = {},
     fetchAvailableMeetings: (String, String, String) -> Unit = { _, _, _ -> },
     fetchAvailableUsers: () -> Unit = {},
     availableMeetingRooms: List<MeetingRoom?> = emptyList(),
@@ -138,11 +148,23 @@ fun BookingScreen(
     var attendees by remember {
         mutableStateOf(emptyList<String>())
     }
+    var showDialog by remember {
+        mutableStateOf(false)
+    }
 
     when (bookingUiState) {
-        is BookingUiState.BookingSuccess -> navigateToConfirmation.invoke()
+        is BookingUiState.BookingSuccess -> {
+            BookingConfirmed(
+                onConfirmation = { navigateToDashboard.invoke() },
+                dialogTitle = "Booking Confirmed",
+                dialogText = "Booking confirmation",
+            )
+        }
+
         is BookingUiState.Loading -> Loading()
-        is BookingUiState.NoMeetingRoomsAvailable -> {} //Show a toast
+        is BookingUiState.NoMeetingRoomsAvailable -> {
+            Toast.makeText(LocalContext.current, "No Meeting Rooms Available", Toast.LENGTH_SHORT).show()
+        }
     }
 
     Scaffold(
@@ -220,7 +242,7 @@ fun BookingScreen(
                         endTime,
                         title,
                         selectedRoomID,
-                        "host",
+                        host,
                         date,
                         attendees.filter {
                             it.isNotEmpty()
@@ -597,6 +619,39 @@ fun CustomSearchBar(onSearch: (String) -> Unit) {
         }
 
     }
+}
+
+
+@Composable
+fun BookingConfirmed(
+    onConfirmation: () -> Unit,
+    dialogTitle: String,
+    dialogText: String,
+) {
+    AlertDialog(
+        icon = {
+            Icon(Icons.Default.Check, contentDescription = "Confirmed")
+        },
+        title = {
+            Text(text = dialogTitle)
+        },
+        text = {
+            Text(text = dialogText)
+        },
+        onDismissRequest = {
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirmation()
+                }
+            ) {
+                Text("Okay")
+            }
+        },
+        dismissButton = {
+        }
+    )
 }
 
 

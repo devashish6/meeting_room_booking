@@ -1,6 +1,7 @@
 package com.booking.login
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -82,8 +84,12 @@ fun LoginScreen(
         when(loginUiState) {
             is LoginUiState.Loading -> Loading()
             is LoginUiState.Success -> onSuccessfulLogin.invoke()
-            is LoginUiState.InvalidEmailID -> {} //show a toast
-            is LoginUiState.InvalidCredentials -> {} //show a toast
+            is LoginUiState.InvalidEmailID -> {
+                Toast.makeText(LocalContext.current, "Please enter a valid email-id", Toast.LENGTH_SHORT).show()
+            }
+            is LoginUiState.InvalidCredentials -> {
+                Toast.makeText(LocalContext.current, "email-id and password doesn't match", Toast.LENGTH_SHORT).show()
+            }
             is LoginUiState.None -> Log.e(TAG, "LoginScreen: ")
         }
     }

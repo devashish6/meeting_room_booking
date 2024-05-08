@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="booking_confirmed">Booking Confirmed</string>
-    <string name="booking_on_date_at_time">Booking on : %1s at %2s</string>
-    <string name="invitees_are">Invitees are :</string>
-    <string name="go_home">Go Home</string>
-</resources>

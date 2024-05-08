@@ -5,7 +5,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.booking.booking.BookingsRoute
-import com.booking.confirm.ConfirmationScreen
 import com.booking.dashboard.ui.theme.DashboardRoute
 import com.booking.home.HomeScreen
 import com.booking.login.LoginRoute
@@ -13,7 +12,8 @@ import com.booking.registration.RegistrationRoute
 
 @Composable
 fun NavigationHost(
-    startDestination: String = Routes.Booking.route
+    startDestination: String = Routes.Home.route,
+    userName: String
 ) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = startDestination) {
@@ -36,16 +36,17 @@ fun NavigationHost(
             )
         }
         composable(Routes.Dashboard.route) {
-            DashboardRoute(navigateToBooking = {navController.navigate(Routes.Booking.route)})
+            DashboardRoute(
+                navigateToBooking = {navController.navigate(Routes.Booking.route)}
+            )
         }
         composable(Routes.Booking.route) {
             BookingsRoute(
-                navigateToConfirmation = { navController.navigate(Routes.Confirm.route)},
-                onBackClicked = { navController.navigateUp() }
+                navController = navController,
+                navigateToDashboard = { navController.navigate(Routes.Dashboard.route)},
+                onBackClicked = { navController.navigateUp() },
+                userName = userName
             )
-        }
-        composable(Routes.Confirm.route) {
-            ConfirmationScreen()
         }
     }
 

@@ -55,18 +55,20 @@ android {
 dependencies {
     //projects
     implementation(project(":core:data"))
-
-    //Dagger
-    implementation(libs.dagger.hilt)
-    implementation(libs.androidx.hilt.common)
-    implementation(libs.androidx.hilt.work)
     implementation(project(":feature:dashboard"))
     implementation(project(":feature:dashboard"))
     implementation(project(":feature:booking"))
     implementation(project(":feature:login"))
     implementation(project(":feature:registration"))
     implementation(project(":feature:home"))
-    implementation(project(":feature:confirm"))
+    implementation(project(":core:datastore"))
+
+    //Dagger
+    implementation(libs.dagger.hilt)
+    implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.hilt.navigation)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     kapt(libs.dagger.hilt.compiler)
 
     //Worker
@@ -81,6 +83,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.navigation.compose)
+//    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.core.i18n)
 
     //compose-test
