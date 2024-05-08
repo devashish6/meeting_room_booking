@@ -159,9 +159,10 @@ fun DashboardScreen(
                     Image(
                         imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                         contentDescription = "exit",
-                        modifier = Modifier.rotate(180f)
+                        modifier = Modifier
+                            .rotate(180f)
                             .clickable {
-
+                                navigateToHome()
                             })
                 }
             )
@@ -176,17 +177,6 @@ fun DashboardScreen(
         },
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            /**
-            Calendar Title Bar
-             */
-//            CalendarPickerBar(
-//                headerDate = dates.selectedDate.date,
-//                updateSelectedDate = {
-//                    dates.selectedDate.date = it
-//                    Log.d(TAG, "DashboardScreen: fetching data after change in date from calendar")
-//                    fetchMeetingsForTheDate(it.toString())
-//                    dates = getDates(lastSelectedDate = it)
-//                })
 
             /**
             Working days in a week with the selected date's Monday being the start date. Weekends not included.

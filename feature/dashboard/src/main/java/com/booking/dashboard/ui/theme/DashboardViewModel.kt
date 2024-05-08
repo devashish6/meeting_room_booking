@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.booking.data.repository.DataRepository
+import com.booking.data.worker.initializeWorker
 import com.booking.datastore.model.Session
 import com.booking.model.model.BookedMeetingRoom
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,6 +35,7 @@ class DashboardViewModel @Inject constructor(
         get() = dataRepository.bookedMeetingRooms
 
     fun getBookedTimeslots(date: String) {
+        initializeWorker(workManager)
         _dashboardUiState.value = DashboardUiState.Loading
         viewModelScope.launch {
             dataRepository.markTimeSlots(date = date)
