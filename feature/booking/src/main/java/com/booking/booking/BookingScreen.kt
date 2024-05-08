@@ -1,11 +1,8 @@
 package com.booking.booking
 
 import android.app.TimePickerDialog
-import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,15 +26,12 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -166,7 +160,9 @@ fun BookingScreen(
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Close",
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .clickable { onBackClicked() }
                     )
                 }
             )
@@ -234,7 +230,8 @@ fun BookingScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                colors = ButtonColors(containerColor = Color.Black,
+                colors = ButtonColors(
+                    containerColor = Color.Black,
                     contentColor = Color.White,
                     disabledContainerColor = Color.Cyan,
                     disabledContentColor = Color.Cyan
@@ -266,17 +263,15 @@ private fun BottomSheet(
     var showSaveButton by remember {
         mutableStateOf(false)
     }
-    var headerText by remember {
+    val headerText by remember {
         mutableStateOf(clickableText)
+    }
+    var textFieldValue by remember {
+        mutableStateOf("")
     }
     var showBottomSheet by remember {
         mutableStateOf(false)
     }
-//    Card(
-//        modifier = Modifier
-//            .padding(top = 16.dp)
-//            .fillMaxWidth()
-//    ) {
     OutlinedTextField(
         label = {
             Text(
@@ -284,7 +279,7 @@ private fun BottomSheet(
                 style = MaterialTheme.typography.bodySmall,
             )
         },
-        value = headerText,
+        value = textFieldValue,
         onValueChange = {},
         trailingIcon = {
             Image(
@@ -322,7 +317,7 @@ private fun BottomSheet(
                                     style = MaterialTheme.typography.labelLarge,
                                     modifier = Modifier.clickable {
                                         saveData(listOf(it.meetingRoomID))
-                                        headerText = it.meetingRoomName
+                                        textFieldValue = it.meetingRoomName
                                         showBottomSheet = false
                                     }
                                 )
@@ -362,6 +357,9 @@ private fun BottomSheet(
                         onClick =
                         {
                             saveData(selectedUsers as List<String>)
+                            selectedUsers.forEach {
+                                textFieldValue = "$textFieldValue $it,"
+                            }
                             showBottomSheet = false
                         },
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -372,7 +370,6 @@ private fun BottomSheet(
             }
         }
     }
-//    }
 }
 
 @Composable
@@ -484,37 +481,6 @@ fun SelectTime(
             modifier = Modifier.width(160.dp)
         )
     }
-
-//    Card(
-//        modifier = Modifier
-//            .padding(start = 8.dp, top = 16.dp, end = 8.dp)
-//            .fillMaxWidth()
-//    ) {
-//        ClickableText(
-//            titleText = stringResource(R.string.from_time),
-//            onClick = {
-//                showTimePickerDialog("startTime")
-//                startHeader = startTime
-//            },
-//            clickableText = startHeader,
-//            modifier = Modifier.padding(top = 10.dp, start = 8.dp, bottom = 10.dp)
-//        )
-//    }
-//    Card(
-//        modifier = Modifier
-//            .padding(start = 8.dp, top = 16.dp, end = 8.dp)
-//            .fillMaxWidth(),
-//    ) {
-//        ClickableText(
-//            titleText = stringResource(R.string.to_time),
-//            onClick = {
-//                showTimePickerDialog("endTime")
-//                endHeader = endTime
-//            },
-//            clickableText = endHeader,
-//            modifier = Modifier.padding(top = 10.dp, start = 8.dp, bottom = 10.dp)
-//        )
-//    }
 }
 
 @Composable
@@ -589,36 +555,6 @@ fun TitleCompose(
 }
 
 @Composable
-private fun ClickableText(
-    titleText: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    clickableText: String = stringResource(id = R.string.select_time)
-) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        modifier = modifier
-    ) {
-        Text(
-            text = titleText,
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp)
-                .weight(1f)
-        )
-        Text(
-            text = clickableText,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier
-                .padding(horizontal = 12.dp)
-                .clickable { onClick.invoke() }
-        )
-    }
-}
-
-@Composable
 fun CustomSearchBar(onSearch: (String) -> Unit) {
     var searchText by remember { mutableStateOf("") }
     var isHintDisplayed by remember {
@@ -665,7 +601,6 @@ fun CustomSearchBar(onSearch: (String) -> Unit) {
 
 
 @Preview(showBackground = true)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun Preview() {
     BookingScreen()
