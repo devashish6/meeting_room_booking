@@ -1,6 +1,7 @@
 package com.booking.dashboard.ui.theme
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -17,12 +18,17 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,7 +60,8 @@ private const val TAG = "DASHBOARD_SCREEN_DEBUG"
 @Composable
 fun DashboardRoute(
     viewModel: DashboardViewModel = hiltViewModel(),
-    navigateToBooking: () -> Unit
+    navigateToBooking: () -> Unit,
+    navigateToHome: () -> Unit,
 ) {
     val workerStatus = viewModel.workerState.collectAsStateWithLifecycle()
     val dashboardUiState = viewModel.dashboardUiState.collectAsStateWithLifecycle()
@@ -71,18 +79,24 @@ fun DashboardRoute(
         workerStatus = workerStatus.value,
         dashboardUiState = dashboardUiState.value,
         fetchMeetingsForTheDate = { viewModel.getBookedTimeslots(it) },
+        navigateToHome = {
+            viewModel.logoutUser()
+            navigateToHome()
+        },
         navigateToBooking = navigateToBooking,
         bookedMeetingRoom = bookedMeetingRoom.value.filterNotNull()
     )
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
     workerStatus: WorkInfo.State,
     dashboardUiState: DashboardUiState = DashboardUiState.Loading,
     fetchMeetingsForTheDate: (String) -> Unit = { _ -> },
     navigateToBooking: () -> Unit = {},
+    navigateToHome: () -> Unit = {},
     bookedMeetingRoom: List<BookedMeetingRoom>
 ) {
     /**
@@ -126,6 +140,32 @@ fun DashboardScreen(
     fetchMeetingsForTheDate(dates.selectedDate.date.toString())
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    CalendarPickerBar(
+                        headerDate = dates.selectedDate.date,
+                        updateSelectedDate = {
+                            dates.selectedDate.date = it
+                            Log.d(
+                                TAG,
+                                "DashboardScreen: fetching data after change in date from calendar"
+                            )
+                            fetchMeetingsForTheDate(it.toString())
+                            dates = getDates(lastSelectedDate = it)
+                        })
+                },
+                navigationIcon = {
+                    Image(
+                        imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                        contentDescription = "exit",
+                        modifier = Modifier.rotate(180f)
+                            .clickable {
+
+                            })
+                }
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navigateToBooking.invoke() },
@@ -133,20 +173,20 @@ fun DashboardScreen(
             ) {
                 Text(text = "Book")
             }
-        }
+        },
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             /**
             Calendar Title Bar
              */
-            CalendarPickerBar(
-                headerDate = dates.selectedDate.date,
-                updateSelectedDate = {
-                    dates.selectedDate.date = it
-                    Log.d(TAG, "DashboardScreen: fetching data after change in date from calendar")
-                    fetchMeetingsForTheDate(it.toString())
-                    dates = getDates(lastSelectedDate = it)
-                })
+//            CalendarPickerBar(
+//                headerDate = dates.selectedDate.date,
+//                updateSelectedDate = {
+//                    dates.selectedDate.date = it
+//                    Log.d(TAG, "DashboardScreen: fetching data after change in date from calendar")
+//                    fetchMeetingsForTheDate(it.toString())
+//                    dates = getDates(lastSelectedDate = it)
+//                })
 
             /**
             Working days in a week with the selected date's Monday being the start date. Weekends not included.
@@ -215,7 +255,7 @@ fun CalendarPickerBar(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = headerDate.toString(),
+            text = headerDate.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy")),
             style = MaterialTheme.typography.labelLarge,
             modifier = Modifier
                 .clickable {

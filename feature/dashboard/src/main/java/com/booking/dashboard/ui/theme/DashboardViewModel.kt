@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.booking.data.repository.DataRepository
+import com.booking.datastore.model.Session
 import com.booking.model.model.BookedMeetingRoom
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
     private val dataRepository: DataRepository,
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
+    private val session: Session
 ) : ViewModel() {
 
     private val TAG = "DASHBOARD_VIEWMODEL"
@@ -51,6 +53,13 @@ class DashboardViewModel @Inject constructor(
             workManager.getWorkInfoByIdFlow(id).collect {
                 workerState.value = it.state
             }
+        }
+    }
+
+    fun logoutUser() {
+        viewModelScope.launch {
+            session.setUserLoggedIn(false)
+            session.setUserName("")
         }
     }
 

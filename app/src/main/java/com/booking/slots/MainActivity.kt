@@ -22,9 +22,6 @@ class MainActivity : ComponentActivity() {
                 startDestination = Routes.Dashboard.route
             }
             NavigationHost(startDestination = startDestination, userName.value)
-//            SlotsTheme {
-//                RegistrationRoute(onSuccessfulRegistration = {})
-//            }
         }
     }
 }

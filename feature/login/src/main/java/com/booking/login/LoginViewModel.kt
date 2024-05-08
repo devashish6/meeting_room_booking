@@ -3,7 +3,9 @@ package com.booking.login
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkManager
 import com.booking.data.repository.DataRepository
+import com.booking.data.worker.initializeWorker
 import com.booking.datastore.model.Session
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,10 +16,9 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val dataRepository: DataRepository,
-    private val session: Session
+    private val session: Session,
+    private val workManager: WorkManager
 ) : ViewModel() {
-
-//    private lateinit var syncWorker: SyncWorker
 
     private val TAG = "LOGIN_VIEWMODEL"
 
@@ -28,6 +29,7 @@ class LoginViewModel @Inject constructor(
 
 
     fun validateLoginCredentials(email: String, password: String) {
+        initializeWorker(workManager)
         if (email.isNotEmpty() && password.isNotEmpty()) {
             viewModelScope.launch {
                 if (!email.contains("@") || !email.endsWith(".com")) {

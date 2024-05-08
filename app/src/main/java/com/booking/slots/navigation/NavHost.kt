@@ -37,7 +37,8 @@ fun NavigationHost(
         }
         composable(Routes.Dashboard.route) {
             DashboardRoute(
-                navigateToBooking = {navController.navigate(Routes.Booking.route)}
+                navigateToBooking = {navController.navigate(Routes.Booking.route)},
+                navigateToHome = { navController.navigate(Routes.Home.route)}
             )
         }
         composable(Routes.Booking.route) {

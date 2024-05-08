@@ -3,4 +3,7 @@
     <string name="login_enter_your_email">Enter Your Email</string>
     <string name="login_enter_your_password">Enter Your Password</string>
     <string name="login_login">Login</string>
+    <string name="login_details">Login Details</string>
+    <string name="please_enter_a_valid_email_id">Please enter a valid email-id</string>
+    <string name="email_id_and_password_doesn_t_match">email-id and password doesn\'t match</string>
 </resources>
