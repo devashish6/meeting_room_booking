@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -67,6 +68,7 @@ class BookingsViewModel @Inject constructor(
             Log.d(TAG, "bookMeetingRoom: $attendees")
             Log.d(TAG, "bookMeetingRoom: $meetingRoomId")
             val bookingStatus = dataRepository.bookMeetingRoom(
+                meetingRoomBookingId = UUID.randomUUID().toString(),
                 startTime = startTime,
                 endTime = endTime,
                 title = title,

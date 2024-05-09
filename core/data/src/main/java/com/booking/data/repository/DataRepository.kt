@@ -190,6 +190,7 @@ class DataRepository @Inject constructor(
     }
 
     suspend fun bookMeetingRoom(
+        meetingRoomBookingId: String,
         startTime: String,
         endTime: String,
         title: String,
@@ -200,6 +201,7 @@ class DataRepository @Inject constructor(
     ): Boolean {
 
         val bookingHashMap = HashMap<String, Any>()
+        bookingHashMap["meeting_room_booking_id"] = meetingRoomBookingId
         bookingHashMap["from_time"] = startTime
         bookingHashMap["to_time"] = endTime
         bookingHashMap["meeting_room_id"] = meetingRoomId
