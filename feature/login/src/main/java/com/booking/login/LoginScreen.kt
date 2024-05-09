@@ -47,6 +47,7 @@ fun LoginRoute(
     LoginScreen(
         onBackClicked = onBackClicked,
         loginUiState = loginUiState.value,
+        setUiState = {state -> loginViewModel.setLoginUiState(state) },
         onSuccessfulLogin = onSuccessfulLogin,
         loginValidation = { email, password ->
             loginViewModel.validateLoginCredentials(email = email, password = password)
@@ -57,6 +58,7 @@ fun LoginRoute(
 @Composable
 fun LoginScreen(
     onBackClicked: () -> Unit = {},
+    setUiState: (LoginUiState) -> Unit = {},
     loginUiState: LoginUiState,
     loginValidation: (String, String) -> Unit,
     onSuccessfulLogin: () -> Unit
@@ -120,13 +122,19 @@ fun LoginScreen(
                 modifier = Modifier.padding(top = 40.dp)
             )
             when (loginUiState) {
-                is LoginUiState.Loading -> Loading()
-                is LoginUiState.Success -> onSuccessfulLogin.invoke()
+                is LoginUiState.Loading -> {
+                    Loading()
+                }
+                is LoginUiState.Success -> {
+                    onSuccessfulLogin.invoke()
+                    setUiState(LoginUiState.None)
+                }
                 is LoginUiState.InvalidEmailID -> {
                     Toast.makeText(
                         LocalContext.current,
                         stringResource(R.string.please_enter_a_valid_email_id), Toast.LENGTH_SHORT
                     ).show()
+                    setUiState(LoginUiState.None)
                 }
 
                 is LoginUiState.InvalidCredentials -> {
@@ -135,6 +143,7 @@ fun LoginScreen(
                         stringResource(R.string.email_id_and_password_doesn_t_match),
                         Toast.LENGTH_SHORT
                     ).show()
+                    setUiState(LoginUiState.None)
                 }
 
                 is LoginUiState.None -> Log.e(TAG, "LoginScreen: ")

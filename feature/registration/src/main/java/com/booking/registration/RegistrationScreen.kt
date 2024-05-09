@@ -49,6 +49,7 @@ fun RegistrationRoute(
     registrationViewModel.registrationUiState.collectAsStateWithLifecycle()
     RegistrationScreen(
         onBackClicked = onBackClicked,
+        setUiState = { state -> registrationViewModel.setUiState(state) },
         registrationUiState = registrationUiState,
         onSuccessfulRegistration = onSuccessfulRegistration,
         onRegistrationClick = { name, email, password, confirmedPassword ->
@@ -61,6 +62,7 @@ fun RegistrationRoute(
 @Composable
 fun RegistrationScreen(
     onBackClicked: () -> Unit = {},
+    setUiState: (RegistrationUiState) -> Unit = {},
     registrationUiState: RegistrationUiState,
     onSuccessfulRegistration: () -> Unit,
     onRegistrationClick: (String, String, String, String) -> Unit
@@ -152,20 +154,38 @@ fun RegistrationScreen(
     when (registrationUiState) {
         is RegistrationUiState.Loading -> {
             Loading()
+            setUiState(RegistrationUiState.None)
         }
-        is RegistrationUiState.Success -> onSuccessfulRegistration.invoke()
+
+        is RegistrationUiState.Success -> {
+            onSuccessfulRegistration.invoke()
+            setUiState(RegistrationUiState.None)
+        }
+
         is RegistrationUiState.InvalidEmailID -> {
-            Toast.makeText(LocalContext.current,
-                stringResource(R.string.please_enter_a_valid_email_id), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                LocalContext.current,
+                stringResource(R.string.please_enter_a_valid_email_id), Toast.LENGTH_SHORT
+            ).show()
+            setUiState(RegistrationUiState.None)
         }
+
         is RegistrationUiState.AccountAlreadyExists -> {
-            Toast.makeText(LocalContext.current,
-                stringResource(R.string.account_already_exists), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                LocalContext.current,
+                stringResource(R.string.account_already_exists), Toast.LENGTH_SHORT
+            ).show()
+            setUiState(RegistrationUiState.None)
         }
+
         is RegistrationUiState.PasswordMismatch -> {
-            Toast.makeText(LocalContext.current,
-                stringResource(R.string.passwords_doesn_t_match), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                LocalContext.current,
+                stringResource(R.string.passwords_doesn_t_match), Toast.LENGTH_SHORT
+            ).show()
+            setUiState(RegistrationUiState.None)
         }
+
         is RegistrationUiState.None -> {}
     }
 }

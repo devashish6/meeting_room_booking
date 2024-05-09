@@ -10,6 +10,7 @@ import com.booking.datastore.model.Session
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,13 +28,18 @@ class LoginViewModel @Inject constructor(
     val loginUiState : StateFlow<LoginUiState>
         get() = _loginUiState
 
+    fun setLoginUiState(state: LoginUiState) {
+        _loginUiState.update { state }
+    }
+
 
     fun validateLoginCredentials(email: String, password: String) {
         initializeWorker(workManager)
+        setLoginUiState(LoginUiState.Loading)
         if (email.isNotEmpty() && password.isNotEmpty()) {
             viewModelScope.launch {
                 if (!email.contains("@") || !email.endsWith(".com")) {
-                    _loginUiState.value = LoginUiState.InvalidEmailID
+                    setLoginUiState(LoginUiState.InvalidEmailID)
                     Log.d(TAG, "validateLoginCredentials: ${loginUiState.value}")
                     session.setUserLoggedIn(false)
                     return@launch
@@ -43,13 +49,13 @@ class LoginViewModel @Inject constructor(
                 if (user.value?.email == email && user.value!!.password == password)  {
                     session.setUserLoggedIn(true)
                     session.setUserName(user.value!!.email)
-                    _loginUiState.value = LoginUiState.Success(user.value!!)
+                    setLoginUiState(LoginUiState.Success(user.value!!))
                     Log.d(TAG, "validateLoginCredentials: ${loginUiState.value}")
-                    return@launch
+                } else {
+                    Log.d(TAG, "validateLoginCredentials: ${loginUiState.value}")
+                    setLoginUiState(LoginUiState.InvalidCredentials)
                 }
             }
         }
-        Log.d(TAG, "validateLoginCredentials: ${loginUiState.value}")
-        _loginUiState.value = LoginUiState.InvalidCredentials
     }
 }

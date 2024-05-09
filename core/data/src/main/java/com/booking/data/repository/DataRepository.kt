@@ -96,58 +96,65 @@ class DataRepository @Inject constructor(
     suspend fun syncWith(): Boolean {
         return try {
             val remoteUsers = remoteDataSource.getAllUsers()
-            if (localDataSourceInterface.getAllUsers().isEmpty()) {
+//            if (localDataSourceInterface.getAllUsers().isEmpty()) {
                 localDataSourceInterface.addUsers(remoteUsers.asListOfUserEntity())
-            } else {
-                val offLineData = localDataSourceInterface.getAllUsers()
-                val remoteData = remoteUsers.asListOfUserEntity()
-
-                remoteData.forEach { remote ->
-                    offLineData.forEach { local ->
-                        if (remote.email == local?.email) {
-                            if (remote != local) {
-                                localDataSourceInterface.updateUser(remote)
-                            }
-                        }
-                    }
-                }
-            }
+//            } else {
+//                val offLineData = localDataSourceInterface.getAllUsers()
+//                val remoteData = remoteUsers.asListOfUserEntity()
+//
+//                remoteData.forEach { remote ->
+//                    var dataExists = false
+//                    offLineData.forEach { local ->
+//                        if (remote.email == local?.email) {
+//                            dataExists = true
+//                            if (remote != local) {
+//                                localDataSourceInterface.updateUser(remote)
+//                            }
+//                        } else if (!dataExists){
+//                            localDataSourceInterface.addUser(remote)
+//                            dataExists = false
+//                        }
+//                    }
+//                }
+//            }
 
             val remoteMeetingRooms = remoteDataSource.getAllMeetingRooms()
-            if (localDataSourceInterface.getAllMeetingRooms().isEmpty()) {
+//            if (localDataSourceInterface.getAllMeetingRooms().isEmpty()) {
                 localDataSourceInterface.addMeetingRooms(remoteMeetingRooms.asListOfMeetingRoomEntity())
-            } else {
-                val offLineData = localDataSourceInterface.getAllMeetingRooms()
-                val remoteData = remoteMeetingRooms.asListOfMeetingRoomEntity()
-
-                remoteData.forEach { remote ->
-                    offLineData.forEach { local ->
-                        if (remote.meetingRoomID == local?.meetingRoomID) {
-                            if (remote != local) {
-                                localDataSourceInterface.updateMeetingRoom(remote)
-                            }
-                        }
-                    }
-                }
-            }
+//            } else {
+//                val offLineData = localDataSourceInterface.getAllMeetingRooms()
+//                val remoteData = remoteMeetingRooms.asListOfMeetingRoomEntity()
+//
+//                remoteData.forEach { remote ->
+//                    var dataExists = false
+//                    offLineData.forEach { local ->
+//                        if (remote.meetingRoomID == local?.meetingRoomID) {
+//                            dataExists = true
+//                            if (remote != local) {
+//                                localDataSourceInterface.updateMeetingRoom(remote)
+//                            }
+//                        } else if (dataExists)
+//                    }
+//                }
+//            }
 
             val remoteBookedMeetingRooms = remoteDataSource.getBookedMeetingRooms()
-            if (localDataSourceInterface.getBookedMeetingRooms().isEmpty()) {
+//            if (localDataSourceInterface.getBookedMeetingRooms().isEmpty()) {
                 localDataSourceInterface.addBookedMeetingRooms(remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity())
-            } else {
-                val offLineData = localDataSourceInterface.getBookedMeetingRooms()
-                val remoteData = remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity()
-
-                remoteData.forEach { remote ->
-                    offLineData.forEach { local ->
-                        if (remote.meetingRoomBookID == local?.meetingRoomBookID) {
-                            if (remote != local) {
-                                localDataSourceInterface.updateBookedMeetingRooms(remote)
-                            }
-                        }
-                    }
-                }
-            }
+//            } else {
+//                val offLineData = localDataSourceInterface.getBookedMeetingRooms()
+//                val remoteData = remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity()
+//
+//                remoteData.forEach { remote ->
+//                    offLineData.forEach { local ->
+//                        if (remote.meetingRoomBookID == local?.meetingRoomBookID) {
+//                            if (remote != local) {
+//                                localDataSourceInterface.updateBookedMeetingRooms(remote)
+//                            }
+//                        }
+//                    }
+//                }
+//            }
 //            _bookedMeetingRooms.emit(
 //                remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity()
 //                    .map { it.asDomainModel() })
@@ -181,6 +188,13 @@ class DataRepository @Inject constructor(
         Log.d(TAG, "createUser request body: " + convertToCustomFormat(userHashMap).toString())
         return try {
             val user = remoteDataSource.createUser(convertToCustomFormat(userHashMap))
+            localDataSourceInterface.addUser(
+                UserEntity(
+                    email = emailID,
+                    name = name,
+                    password = password
+                )
+            )
             Log.d(TAG, "createUser: $user")
             true
         } catch (e: Exception) {
@@ -214,6 +228,18 @@ class DataRepository @Inject constructor(
             val requestJson = convertToFormat(bookingHashMap)
             Log.d(TAG, "bookMeetingRoom: $requestJson")
             remoteDataSource.bookMeetingRoom(requestJson)
+//            localDataSourceInterface.updateBookedMeetingRooms(
+//                BookedMeetingRoomEntity(
+//                    meetingRoomBookID = meetingRoomBookingId,
+//                    meetingRoomID = meetingRoomId,
+//                    fromTime = startTime,
+//                    toTime = endTime,
+//                    host = host,
+//                    date = date,
+//                    meetingTitle = title,
+//                    attendees = attendees
+//                )
+//            )
             true
         } catch (e: Exception) {
             Log.e(TAG, "bookMeetingRoom: ${e.stackTrace}")

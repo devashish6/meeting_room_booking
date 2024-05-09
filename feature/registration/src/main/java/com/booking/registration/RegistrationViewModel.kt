@@ -8,7 +8,6 @@ import com.booking.data.repository.DataRepository
 import com.booking.data.worker.initializeWorker
 import com.booking.model.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,6 +27,10 @@ class RegistrationViewModel @Inject constructor(
 
     val registrationUiState: StateFlow<RegistrationUiState>
         get() = _registrationUiState.asStateFlow()
+
+    fun setUiState(state: RegistrationUiState) {
+        _registrationUiState.value = state
+    }
 
     fun registerUser(name: String, email: String, password: String, confirmedPassword: String) {
         initializeWorker(workManager)
