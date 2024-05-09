@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="register_enter_your_name">Enter Your Name</string>
+    <string name="register_enter_your_email">Enter Your Email ID</string>
+    <string name="register_enter_your_password">Enter Your Password</string>
+    <string name="register_confirm_your_password">Confirm Your Password</string>
+    <string name="register_confirm">Confirm</string>
+    <string name="enter_your_details">Enter your details</string>
+    <string name="please_enter_a_valid_email_id">Please enter a valid email-id</string>
+    <string name="account_already_exists">Account already exists</string>
+    <string name="passwords_doesn_t_match">Passwords doesn\'t match</string>
+</resources>

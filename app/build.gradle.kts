@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.firebase)
     alias(libs.plugins.hiltAndroid)
     kotlin("kapt")
 }
@@ -11,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.booking.slots"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -52,22 +53,54 @@ android {
 }
 
 dependencies {
+    //projects
+    implementation(project(":core:data"))
+    implementation(project(":feature:dashboard"))
+    implementation(project(":feature:dashboard"))
+    implementation(project(":feature:booking"))
+    implementation(project(":feature:login"))
+    implementation(project(":feature:registration"))
+    implementation(project(":feature:home"))
+    implementation(project(":core:datastore"))
 
+    //Dagger
+    implementation(libs.dagger.hilt)
+    implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.hilt.navigation)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    kapt(libs.dagger.hilt.compiler)
+
+    //Worker
+    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+
+    //compose
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.navigation.compose)
+//    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.core.i18n)
+
+    //compose-test
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+
+    //material3
     implementation(libs.androidx.material3)
-    implementation(libs.dagger.hilt)
-    kapt(libs.dagger.hilt.compiler)
+
+    //firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+
+    //tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 }

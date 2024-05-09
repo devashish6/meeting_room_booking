@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "130239835252",
+    "project_id": "slots-21fc8",
+    "storage_bucket": "slots-21fc8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:130239835252:android:88a39f31944fb21619b521",
+        "android_client_info": {
+          "package_name": "com.booking.slots"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPteeEMcb8CpOJBFU0T6-byI5RuGRgx04"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

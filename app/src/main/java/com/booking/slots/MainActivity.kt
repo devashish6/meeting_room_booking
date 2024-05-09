@@ -3,28 +3,25 @@ package com.booking.slots
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.booking.slots.ui.theme.SlotsTheme
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.booking.slots.navigation.NavigationHost
+import com.booking.slots.navigation.Routes
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SlotsTheme {
-
+            val mainViewModel : MainViewModel = hiltViewModel()
+            val isLoggedIn = mainViewModel.isLoggedIn.collectAsStateWithLifecycle()
+            val userName = mainViewModel.userName.collectAsStateWithLifecycle()
+            var startDestination = Routes.Home.route
+            if (isLoggedIn.value) {
+                startDestination = Routes.Dashboard.route
             }
+            NavigationHost(startDestination = startDestination, userName.value)
         }
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//
-//}

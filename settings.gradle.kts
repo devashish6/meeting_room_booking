@@ -21,4 +21,15 @@ dependencyResolutionManagement {
 
 rootProject.name = "Slots"
 include(":app")
- 
+include(":feature:dashboard")
+include(":feature:login")
+include(":feature:registration")
+include(":feature:booking")
+include(":core:model")
+include(":core:data")
+include(":core:datastore")
+include(":core:database")
+include(":core:designsystem")
+include(":core:network")
+include(":core:ui")
+include(":feature:home")
