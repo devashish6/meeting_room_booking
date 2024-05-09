@@ -60,7 +60,7 @@ fun RegistrationRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrationScreen(
-    onBackClicked : () -> Unit = {},
+    onBackClicked: () -> Unit = {},
     registrationUiState: RegistrationUiState,
     onSuccessfulRegistration: () -> Unit,
     onRegistrationClick: (String, String, String, String) -> Unit

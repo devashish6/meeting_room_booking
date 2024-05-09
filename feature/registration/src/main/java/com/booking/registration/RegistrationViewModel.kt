@@ -6,7 +6,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.booking.data.repository.DataRepository
 import com.booking.data.worker.initializeWorker
+import com.booking.model.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,8 +42,7 @@ class RegistrationViewModel @Inject constructor(
             viewModelScope.launch {
                 dataRepository.getAllUsers()
                 val users = dataRepository.users
-                val userExists = users.value.any { it?.email == email }
-                if (userExists) {
+                if (doesUserExist(users.value, email)) {
                     _registrationUiState.value = RegistrationUiState.AccountAlreadyExists
                 } else {
                     val userCreation = dataRepository.createUser(name, email, password)
@@ -54,6 +55,16 @@ class RegistrationViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun doesUserExist(users: List<User?>, email: String): Boolean {
+        var result = false
+        users.forEach {
+            if (it?.email == email) {
+                result = true
+            }
+        }
+        return result
     }
 
 }
