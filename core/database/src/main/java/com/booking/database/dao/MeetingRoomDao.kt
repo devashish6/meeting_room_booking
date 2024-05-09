@@ -28,4 +28,7 @@ interface MeetingRoomDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addMeetingRooms(meetingRooms: List<MeetingRoomEntity>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateMeetingRoom(meetingRoom: MeetingRoomEntity)
+
 }

@@ -20,6 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,7 +37,7 @@ import com.booking.designsystem.component.ComponentButton
 import com.booking.designsystem.component.FormFields
 import com.booking.ui.Loading
 
-private val TAG = "REGISTRATION_SCREEN_DEBUG"
+private const val TAG = "REGISTRATION_SCREEN_DEBUG"
 
 @Composable
 fun RegistrationRoute(
@@ -44,11 +45,11 @@ fun RegistrationRoute(
     onSuccessfulRegistration: () -> Unit,
     onBackClicked: () -> Unit
 ) {
-    val registrationUiState =
-        registrationViewModel.registrationUiState.collectAsStateWithLifecycle()
+    val registrationUiState by
+    registrationViewModel.registrationUiState.collectAsStateWithLifecycle()
     RegistrationScreen(
         onBackClicked = onBackClicked,
-        registrationUiState = registrationUiState.value,
+        registrationUiState = registrationUiState,
         onSuccessfulRegistration = onSuccessfulRegistration,
         onRegistrationClick = { name, email, password, confirmedPassword ->
             registrationViewModel.registerUser(name, email, password, confirmedPassword)
@@ -64,6 +65,7 @@ fun RegistrationScreen(
     onSuccessfulRegistration: () -> Unit,
     onRegistrationClick: (String, String, String, String) -> Unit
 ) {
+
     var name by remember {
         mutableStateOf("")
     }
@@ -76,6 +78,7 @@ fun RegistrationScreen(
     var confirmPassword by remember {
         mutableStateOf("")
     }
+
     Scaffold(
         topBar = {
             TopAppBar(title = {
@@ -123,6 +126,7 @@ fun RegistrationScreen(
                 hintText = password,
                 onValueChange = { password = it },
                 trailingIcon = Icons.Default.Lock,
+                isPasswordField = true,
                 modifier = Modifier.padding(10.dp)
             )
             FormFields(
@@ -130,6 +134,7 @@ fun RegistrationScreen(
                 hintText = confirmPassword,
                 onValueChange = { confirmPassword = it },
                 trailingIcon = Icons.Default.Lock,
+                isPasswordField = true,
                 modifier = Modifier.padding(10.dp)
             )
             ComponentButton(
@@ -141,28 +146,27 @@ fun RegistrationScreen(
                 modifier = Modifier.padding(top = 40.dp)
             )
             Log.d(TAG, "RegistrationScreen: $registrationUiState")
-            when (registrationUiState) {
-                is RegistrationUiState.Loading -> {
-                    Loading()
-                }
-
-                is RegistrationUiState.Success -> onSuccessfulRegistration.invoke()
-                is RegistrationUiState.InvalidEmailID -> {
-                    Toast.makeText(LocalContext.current,
-                        stringResource(R.string.please_enter_a_valid_email_id), Toast.LENGTH_SHORT).show()
-                }
-                is RegistrationUiState.AccountAlreadyExists -> {
-                    Toast.makeText(LocalContext.current,
-                        stringResource(R.string.account_already_exists), Toast.LENGTH_SHORT).show()
-
-                }
-                is RegistrationUiState.PasswordMismatch -> {
-                    Toast.makeText(LocalContext.current,
-                        stringResource(R.string.passwords_doesn_t_match), Toast.LENGTH_SHORT).show()
-                }
-                is RegistrationUiState.None -> {}
-            }
         }
+    }
+
+    when (registrationUiState) {
+        is RegistrationUiState.Loading -> {
+            Loading()
+        }
+        is RegistrationUiState.Success -> onSuccessfulRegistration.invoke()
+        is RegistrationUiState.InvalidEmailID -> {
+            Toast.makeText(LocalContext.current,
+                stringResource(R.string.please_enter_a_valid_email_id), Toast.LENGTH_SHORT).show()
+        }
+        is RegistrationUiState.AccountAlreadyExists -> {
+            Toast.makeText(LocalContext.current,
+                stringResource(R.string.account_already_exists), Toast.LENGTH_SHORT).show()
+        }
+        is RegistrationUiState.PasswordMismatch -> {
+            Toast.makeText(LocalContext.current,
+                stringResource(R.string.passwords_doesn_t_match), Toast.LENGTH_SHORT).show()
+        }
+        is RegistrationUiState.None -> {}
     }
 }
 

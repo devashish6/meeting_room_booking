@@ -15,5 +15,7 @@ interface BookedMeetingRoomDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addBookedMeetingRooms(users: List<BookedMeetingRoomEntity>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateBookedMeetingRooms(bookedMeetingRoom: BookedMeetingRoomEntity)
 
 }

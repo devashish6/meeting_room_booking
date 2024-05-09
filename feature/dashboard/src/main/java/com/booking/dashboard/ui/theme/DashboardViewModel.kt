@@ -51,10 +51,6 @@ class DashboardViewModel @Inject constructor(
                 )
                 _dashboardUiState.value = DashboardUiState.None
             }
-            val id = workManager.getWorkInfosForUniqueWork("SyncWorkName").get()[0].id
-            workManager.getWorkInfoByIdFlow(id).collect {
-                workerState.value = it.state
-            }
         }
     }
 

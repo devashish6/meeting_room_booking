@@ -95,31 +95,65 @@ class DataRepository @Inject constructor(
 
     suspend fun syncWith(): Boolean {
         return try {
-            Log.d(TAG, "syncWith: Calling remote")
             val remoteUsers = remoteDataSource.getAllUsers()
-            Log.d(TAG, "syncWith: remote users : $remoteUsers")
+            if (localDataSourceInterface.getAllUsers().isEmpty()) {
+                localDataSourceInterface.addUsers(remoteUsers.asListOfUserEntity())
+            } else {
+                val offLineData = localDataSourceInterface.getAllUsers()
+                val remoteData = remoteUsers.asListOfUserEntity()
+
+                remoteData.forEach { remote ->
+                    offLineData.forEach { local ->
+                        if (remote.email == local?.email) {
+                            if (remote != local) {
+                                localDataSourceInterface.updateUser(remote)
+                            }
+                        }
+                    }
+                }
+            }
+
             val remoteMeetingRooms = remoteDataSource.getAllMeetingRooms()
-            Log.d(TAG, "syncWith: remote meeting rooms : $remoteMeetingRooms")
+            if (localDataSourceInterface.getAllMeetingRooms().isEmpty()) {
+                localDataSourceInterface.addMeetingRooms(remoteMeetingRooms.asListOfMeetingRoomEntity())
+            } else {
+                val offLineData = localDataSourceInterface.getAllMeetingRooms()
+                val remoteData = remoteMeetingRooms.asListOfMeetingRoomEntity()
+
+                remoteData.forEach { remote ->
+                    offLineData.forEach { local ->
+                        if (remote.meetingRoomID == local?.meetingRoomID) {
+                            if (remote != local) {
+                                localDataSourceInterface.updateMeetingRoom(remote)
+                            }
+                        }
+                    }
+                }
+            }
+
             val remoteBookedMeetingRooms = remoteDataSource.getBookedMeetingRooms()
-            Log.d(TAG, "syncWith: remote booked meeting rooms : $remoteBookedMeetingRooms")
-            localDataSourceInterface.addUsers(remoteUsers.asListOfUserEntity())
-            Log.d(TAG, "syncWith: adding users to database : ${remoteUsers.asListOfUserEntity()}")
-            _users.emit(remoteUsers.asListOfUserEntity().map { it.asDomainModel() })
-            localDataSourceInterface.addMeetingRooms(remoteMeetingRooms.asListOfMeetingRoomEntity())
-            Log.d(
-                TAG,
-                "syncWith: adding meeting room data to database : ${remoteMeetingRooms.asListOfMeetingRoomEntity()}"
-            )
-            _meetingRooms.emit(
-                remoteMeetingRooms.asListOfMeetingRoomEntity().map { it.asDomainModel() })
-            localDataSourceInterface.addBookedMeetingRooms(remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity())
-            Log.d(
-                TAG,
-                "syncWith: adding booked meetings : ${remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity()}"
-            )
-            _bookedMeetingRooms.emit(
-                remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity()
-                    .map { it.asDomainModel() })
+            if (localDataSourceInterface.getBookedMeetingRooms().isEmpty()) {
+                localDataSourceInterface.addBookedMeetingRooms(remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity())
+            } else {
+                val offLineData = localDataSourceInterface.getBookedMeetingRooms()
+                val remoteData = remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity()
+
+                remoteData.forEach { remote ->
+                    offLineData.forEach { local ->
+                        if (remote.meetingRoomBookID == local?.meetingRoomBookID) {
+                            if (remote != local) {
+                                localDataSourceInterface.updateBookedMeetingRooms(remote)
+                            }
+                        }
+                    }
+                }
+            }
+//            _bookedMeetingRooms.emit(
+//                remoteBookedMeetingRooms.asListOfBookedMeetingRoomEntity()
+//                    .map { it.asDomainModel() })
+//            _users.emit(remoteUsers.asListOfUserEntity().map { it.asDomainModel() })
+//            _meetingRooms.emit(
+//                remoteMeetingRooms.asListOfMeetingRoomEntity().map { it.asDomainModel() })
             true
         } catch (e: Exception) {
             Log.e(TAG, e.localizedMessage?.toString() ?: "")
@@ -163,7 +197,7 @@ class DataRepository @Inject constructor(
         host: String,
         date: String,
         attendees: List<String>
-    ) : Boolean {
+    ): Boolean {
 
         val bookingHashMap = HashMap<String, Any>()
         bookingHashMap["from_time"] = startTime
@@ -197,7 +231,8 @@ class DataRepository @Inject constructor(
     }
 
     suspend fun getAvailableMeetingRooms(date: String, fromTime: String, toTime: String) {
-        val availableRooms = localDataSourceInterface.getAvailableMeetingRooms(date, fromTime, toTime)
+        val availableRooms =
+            localDataSourceInterface.getAvailableMeetingRooms(date, fromTime, toTime)
         if (availableRooms.isNotEmpty()) {
             _offlineMeetingRooms.emit(availableRooms)
             _meetingRooms.emit(availableRooms.map { it?.asDomainModel() })

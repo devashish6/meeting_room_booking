@@ -7,7 +7,7 @@ import com.booking.network.model.RemoteBookedMeetingRooms
 import java.util.UUID
 
 fun RemoteBookedMeetingRooms.asEntity() = BookedMeetingRoomEntity(
-    meetingRoomBookID = UUID.randomUUID().toString(),
+    meetingRoomBookID = getMeetingRoomBookingID(),
     meetingRoomID = getMeetingRoomID(),
     fromTime = getFromTime(),
     toTime = getToTime(),
